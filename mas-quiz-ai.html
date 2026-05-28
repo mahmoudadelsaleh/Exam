@@ -6,27 +6,34 @@
     <title>المنصة الذكية - التوليد الفعلي</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #1e3a8a; --primary-light: #3b82f6; --secondary: #0d9488; --bg: #f8fafc; --surface: #ffffff; --text: #0f172a; --border: #e2e8f0; --radius: 12px; }
+        :root { --primary: #1e3a8a; --primary-light: #3b82f6; --secondary: #0d9488; --bg: #f8fafc; --surface: #ffffff; --text: #0f172a; --text-secondary: #64748b; --border: #e2e8f0; --radius: 12px; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
         body { background-color: var(--bg); color: var(--text); padding: 20px; line-height: 1.6; }
         .container { max-width: 800px; margin: 0 auto; }
         header { text-align: center; margin-bottom: 30px; }
         header h1 { color: var(--primary); }
         .card { background: var(--surface); padding: 25px; border-radius: var(--radius); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); margin-bottom: 20px; }
-        .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--primary); }
-        input[type="file"] { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; }
-        .btn { display: block; width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 10px; }
+        
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--primary); font-size: 0.95rem; }
+        input[type="file"], input[type="number"] { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-family: 'Cairo', sans-serif; }
+        
+        /* Grid for inputs */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        @media (max-width: 480px) { .grid-2 { grid-template-columns: 1fr; } }
+
+        .btn { display: block; width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 20px; transition: 0.3s; }
         .btn:hover { background: #152e72; }
         .btn:disabled { background: #94a3b8; cursor: not-allowed; }
-        
+
         #status-message { font-weight: bold; color: var(--secondary); text-align: center; margin-top: 15px; }
         .error-text { color: #dc2626; background: #fee2e2; padding: 10px; border-radius: 8px; font-size: 0.9rem; margin-top: 10px; text-align: right;}
-        
+
         /* Quiz Styles */
         .question-card { background: var(--bg); border-radius: 8px; padding: 18px; margin-top: 20px; border-right: 4px solid var(--primary-light); }
-        .option-item { display: block; padding: 10px; margin-bottom: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; }
-        .option-item input { margin-left: 10px; }
+        .option-item { display: block; padding: 10px; margin-bottom: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; transition: 0.2s; }
+        .option-item:hover { border-color: var(--primary-light); background: #eff6ff; }
+        .option-item input { margin-left: 10px; accent-color: var(--primary); }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
     <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';</script>
@@ -35,14 +42,36 @@
 
 <div class="container">
     <header>
-        <h1>توليد الامتحانات من الـ PDF</h1>
-        <p>يتم قراءة الملف وبناء الأسئلة الحقيقية عبر الذكاء الاصطناعي</p>
+        <h1>توليد الامتحانات المتقدم من الـ PDF</h1>
+        <p>حدد الصفحات والأسئلة والدرجات، واترك الباقي للذكاء الاصطناعي</p>
     </header>
 
     <div class="card" id="setup-section">
-        <div class="form-group">
+        <div class="form-group" style="margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px dashed var(--border);">
             <label>اختر المذكرة أو كتاب الـ PDF</label>
             <input type="file" id="file-upload" accept="application/pdf">
+        </div>
+
+        <div class="grid-2">
+            <div class="form-group">
+                <label>اقرأ من صفحة رقم:</label>
+                <input type="number" id="start-page" value="1" min="1">
+            </div>
+            <div class="form-group">
+                <label>إلى صفحة رقم:</label>
+                <input type="number" id="end-page" value="5" min="1">
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <div class="form-group">
+                <label>عدد الأسئلة المطلوبة:</label>
+                <input type="number" id="q-count" value="5" min="1" max="50">
+            </div>
+            <div class="form-group">
+                <label>الدرجة لكل سؤال:</label>
+                <input type="number" id="q-mark" value="2" min="1">
+            </div>
         </div>
         
         <button class="btn" id="start-btn" onclick="startProcess()">ابدأ القراءة والتوليد</button>
@@ -60,6 +89,11 @@
         const fileInput = document.getElementById('file-upload');
         const statusEl = document.getElementById('status-message');
         const btn = document.getElementById('start-btn');
+        
+        const startPage = parseInt(document.getElementById('start-page').value) || 1;
+        let endPage = parseInt(document.getElementById('end-page').value) || 5;
+        const qCount = parseInt(document.getElementById('q-count').value) || 5;
+        const qMark = parseInt(document.getElementById('q-mark').value) || 2;
 
         if (!fileInput.files.length) {
             alert("يرجى اختيار ملف PDF أولاً");
@@ -67,29 +101,35 @@
         }
 
         btn.disabled = true;
-        statusEl.innerHTML = "الخطوة 1/2: جاري استخراج النص من الملف...";
+        statusEl.innerHTML = `الخطوة 1/2: جاري استخراج النص من صفحة ${startPage} إلى ${endPage}...`;
 
         try {
             const file = fileInput.files[0];
             const arrayBuffer = await file.arrayBuffer();
             const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
             let fullText = "";
-            
-            // تحديد القراءة لأول 10 صفحات لتجنب تجاوز الحد المسموح للبيانات في الطلب الواحد
-            const maxPages = Math.min(pdf.numPages, 10);
-            for (let i = 1; i <= maxPages; i++) {
+
+            // حماية من إدخال أرقام صفحات خاطئة
+            const maxPagesInPdf = pdf.numPages;
+            if (endPage > maxPagesInPdf) endPage = maxPagesInPdf;
+            if (startPage < 1 || startPage > endPage) {
+                throw new Error(`نطاق الصفحات غير منطقي. الملف يحتوي على ${maxPagesInPdf} صفحة فقط.`);
+            }
+
+            // قراءة الصفحات المحددة فقط
+            for (let i = startPage; i <= endPage; i++) {
                 const page = await pdf.getPage(i);
                 const textContent = await page.getTextContent();
                 fullText += textContent.items.map(item => item.str).join(" ") + " ";
             }
 
             if (fullText.trim().length === 0) {
-                throw new Error("الملف يبدو كصور ممسوحة ضوئياً أو فارغ، لم يتمكن المتصفح من استخراج نصوص منه.");
+                throw new Error("لم يتمكن المتصفح من استخراج نصوص. قد يكون الملف عبارة عن صور ممسوحة ضوئياً.");
             }
 
-            statusEl.innerHTML = "الخطوة 2/2: جاري الاتصال بالذكاء الاصطناعي لتأليف الامتحان... (انتظر قليلاً)";
+            statusEl.innerHTML = `الخطوة 2/2: جاري الاتصال بالذكاء الاصطناعي لتأليف ${qCount} أسئلة... (انتظر قليلاً)`;
 
-            await generateQuizFromAI(fullText);
+            await generateQuizFromAI(fullText, qCount, qMark);
 
         } catch (error) {
             statusEl.innerHTML = `<div class="error-text"><strong>تفاصيل الخطأ أثناء القراءة:</strong> ${error.message}</div>`;
@@ -97,23 +137,23 @@
         }
     }
 
-    async function generateQuizFromAI(extractedText) {
+    async function generateQuizFromAI(extractedText, count, mark) {
         const statusEl = document.getElementById('status-message');
         const btn = document.getElementById('start-btn');
 
+        // تمرير عدد الأسئلة المطلوب ديناميكياً للذكاء الاصطناعي
         const prompt = `
-        أنت معلم خبير. استخرج من النص التالي 5 أسئلة اختيار من متعدد مهمة.
+        أنت معلم خبير. استخرج من النص التالي ${count} أسئلة اختيار من متعدد مهمة وتقيس الفهم.
         يجب أن ترد فقط وفقط بصيغة مصفوفة JSON متوافقة، بدون أي حرف إضافي وبدون علامات Markdown.
         مثال دقيق للمطلوب:
         [{"id":1,"text":"السؤال؟","options":["أ","ب","ج","د"],"correct":0,"explanation":"التفسير"}]
         
-        النص:
+        النص المستخرج من الكتاب:
         ${extractedText.substring(0, 15000)}
         `;
 
         try {
             const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
-
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -122,23 +162,24 @@
             });
 
             const data = await response.json();
-            
+
             if(data.error) {
                 throw new Error(data.error.message);
             }
 
             let aiText = data.candidates[0].content.parts[0].text;
-            
-            // استخراج كود الـ JSON فقط في حال كتب الذكاء الاصطناعي أي نصوص إضافية
+
             const jsonMatch = aiText.match(/\[[\s\S]*\]/);
             if (!jsonMatch) {
                 throw new Error("شكل الرد من الخادم غير متوافق: " + aiText);
             }
 
             const questions = JSON.parse(jsonMatch[0]);
+
+            statusEl.innerHTML = "<span style='color: green;'>تم تأليف الامتحان بنجاح!</span>";
             
-            statusEl.innerHTML = "<span style='color: green;'>تم توليد الامتحان بنجاح!</span>";
-            renderQuiz(questions);
+            // تمرير الدرجة لدالة الرسم
+            renderQuiz(questions, mark);
 
         } catch (error) {
             statusEl.innerHTML = `<div class="error-text"><strong>تفاصيل الخطأ من الـ API:</strong> ${error.message}</div>`;
@@ -147,14 +188,21 @@
         }
     }
 
-    function renderQuiz(questions) {
+    function renderQuiz(questions, markPerQuestion) {
         const container = document.getElementById('quiz-container');
-        container.innerHTML = '<h2 style="color:var(--primary); text-align:center; margin-top:20px;">امتحانك التفاعلي</h2>';
+        const totalMarks = questions.length * markPerQuestion;
         
+        container.innerHTML = `
+            <div style="text-align:center; margin-top:30px; padding-bottom: 10px; border-bottom: 2px dashed var(--border);">
+                <h2 style="color:var(--primary); margin-bottom:5px;">امتحانك التفاعلي</h2>
+                <p style="color:var(--text-secondary); font-weight:600;">إجمالي الدرجات: ${totalMarks} درجة</p>
+            </div>
+        `;
+
         questions.forEach((q, index) => {
             const qCard = document.createElement('div');
             qCard.className = 'question-card';
-            
+
             let optionsHTML = '';
             q.options.forEach((opt, optIndex) => {
                 optionsHTML += `
@@ -166,7 +214,12 @@
             });
 
             qCard.innerHTML = `
-                <div style="font-weight: bold; margin-bottom: 10px;">سؤال ${index + 1}: ${q.text}</div>
+                <div style="font-weight: bold; margin-bottom: 12px; display:flex; justify-content:space-between; align-items:flex-start;">
+                    <span>سؤال ${index + 1}: ${q.text}</span>
+                    <span style="color:var(--secondary); font-size:0.9rem; background:#ccfbf1; padding:2px 8px; border-radius:4px; white-space:nowrap; margin-right:10px;">
+                        ${markPerQuestion} درجات
+                    </span>
+                </div>
                 <div>${optionsHTML}</div>
             `;
             container.appendChild(qCard);
