@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>المنصة الذكية - التوليد الفعلي</title>
+    <title>المنصة الذكية - التوليد والتصحيح</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #1e3a8a; --primary-light: #3b82f6; --secondary: #0d9488; --bg: #f8fafc; --surface: #ffffff; --text: #0f172a; --text-secondary: #64748b; --border: #e2e8f0; --radius: 12px; }
+        :root { --primary: #1e3a8a; --primary-light: #3b82f6; --secondary: #0d9488; --bg: #f8fafc; --surface: #ffffff; --text: #0f172a; --border: #e2e8f0; --success: #16a34a; --error: #dc2626; --radius: 12px; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
         body { background-color: var(--bg); color: var(--text); padding: 20px; line-height: 1.6; }
         .container { max-width: 800px; margin: 0 auto; }
@@ -16,24 +16,31 @@
         
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--primary); font-size: 0.95rem; }
-        input[type="file"], input[type="number"] { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-family: 'Cairo', sans-serif; }
+        input[type="file"], input[type="number"], input[type="password"], input[type="text"] { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-family: 'Cairo', sans-serif; }
         
-        /* Grid for inputs */
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
         @media (max-width: 480px) { .grid-2 { grid-template-columns: 1fr; } }
 
         .btn { display: block; width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 20px; transition: 0.3s; }
         .btn:hover { background: #152e72; }
+        .btn-success { background: var(--success); }
+        .btn-success:hover { background: #15803d; }
         .btn:disabled { background: #94a3b8; cursor: not-allowed; }
 
         #status-message { font-weight: bold; color: var(--secondary); text-align: center; margin-top: 15px; }
-        .error-text { color: #dc2626; background: #fee2e2; padding: 10px; border-radius: 8px; font-size: 0.9rem; margin-top: 10px; text-align: right;}
+        .error-text { color: var(--error); background: #fee2e2; padding: 10px; border-radius: 8px; font-size: 0.9rem; margin-top: 10px; text-align: right;}
 
         /* Quiz Styles */
         .question-card { background: var(--bg); border-radius: 8px; padding: 18px; margin-top: 20px; border-right: 4px solid var(--primary-light); }
         .option-item { display: block; padding: 10px; margin-bottom: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; transition: 0.2s; }
         .option-item:hover { border-color: var(--primary-light); background: #eff6ff; }
         .option-item input { margin-left: 10px; accent-color: var(--primary); }
+        
+        /* Result Styles */
+        .result-box { text-align: center; padding: 30px; background: #e0f2fe; border-radius: var(--radius); margin-top: 20px; border: 2px solid var(--primary-light); }
+        .result-score { font-size: 2.5rem; font-weight: bold; color: var(--primary); }
+        .correct-ans { color: var(--success); font-weight: bold; }
+        .wrong-ans { color: var(--error); text-decoration: line-through; }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
     <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';</script>
@@ -42,66 +49,79 @@
 
 <div class="container">
     <header>
-        <h1>توليد الامتحانات المتقدم من الـ PDF</h1>
-        <p>حدد الصفحات والأسئلة والدرجات، واترك الباقي للذكاء الاصطناعي</p>
+        <h1>توليد وتصحيح الامتحانات</h1>
+        <p>منصة المعلم لإدارة الاختبارات المعتمدة على الذكاء الاصطناعي</p>
     </header>
 
     <div class="card" id="setup-section">
-        <div class="form-group" style="margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px dashed var(--border);">
+        <h3 style="margin-bottom: 15px; color: var(--text); border-bottom: 2px solid var(--border); padding-bottom: 5px;">إعدادات المعلم (لتوليد الامتحان)</h3>
+        
+        <div class="form-group">
+            <label>مفتاح API (آمن - لا يُحفظ في الكود):</label>
+            <input type="password" id="api-key" placeholder="ألصق مفتاح Gemini الجديد هنا...">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 25px;">
             <label>اختر المذكرة أو كتاب الـ PDF</label>
             <input type="file" id="file-upload" accept="application/pdf">
         </div>
 
         <div class="grid-2">
-            <div class="form-group">
-                <label>اقرأ من صفحة رقم:</label>
-                <input type="number" id="start-page" value="1" min="1">
-            </div>
-            <div class="form-group">
-                <label>إلى صفحة رقم:</label>
-                <input type="number" id="end-page" value="5" min="1">
-            </div>
+            <div class="form-group"><label>من صفحة رقم:</label><input type="number" id="start-page" value="1" min="1"></div>
+            <div class="form-group"><label>إلى صفحة رقم:</label><input type="number" id="end-page" value="3" min="1"></div>
         </div>
-
         <div class="grid-2">
-            <div class="form-group">
-                <label>عدد الأسئلة المطلوبة:</label>
-                <input type="number" id="q-count" value="5" min="1" max="50">
-            </div>
-            <div class="form-group">
-                <label>الدرجة لكل سؤال:</label>
-                <input type="number" id="q-mark" value="2" min="1">
-            </div>
+            <div class="form-group"><label>عدد الأسئلة المطلوبة:</label><input type="number" id="q-count" value="5" min="1"></div>
+            <div class="form-group"><label>الدرجة لكل سؤال:</label><input type="number" id="q-mark" value="2" min="1"></div>
         </div>
         
-        <button class="btn" id="start-btn" onclick="startProcess()">ابدأ القراءة والتوليد</button>
+        <button class="btn" id="start-btn" onclick="startProcess()">استخراج وتوليد الامتحان للطالب</button>
         <div id="status-message"></div>
     </div>
 
-    <div id="quiz-container"></div>
+    <div id="student-section" style="display: none;">
+        <div class="card">
+            <div class="form-group">
+                <label>اسم الطالب (لتسجيل النتيجة في الإدارة):</label>
+                <input type="text" id="student-name" placeholder="اكتب اسمك الثلاثي...">
+            </div>
+            <form id="quiz-form">
+                <div id="quiz-container"></div>
+                <button type="submit" class="btn btn-success" id="submit-quiz-btn">تسليم الامتحان وتصحيحه</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="result-section" style="display: none;">
+        <div class="result-box" id="result-display"></div>
+        <div id="review-container" class="card" style="margin-top: 20px;"></div>
+    </div>
 </div>
 
 <script>
-    // مفتاحك تم وضعه هنا
-    const GEMINI_API_KEY = "AIzaSyAX2GhGYi0B2aqDcsQLpcEhaoFrGGErKZE"; 
+    let appState = {
+        questions: [],
+        markPerQuestion: 2,
+        totalMarks: 0
+    };
 
     async function startProcess() {
+        const apiKey = document.getElementById('api-key').value.trim();
         const fileInput = document.getElementById('file-upload');
         const statusEl = document.getElementById('status-message');
         const btn = document.getElementById('start-btn');
         
         const startPage = parseInt(document.getElementById('start-page').value) || 1;
-        let endPage = parseInt(document.getElementById('end-page').value) || 5;
+        let endPage = parseInt(document.getElementById('end-page').value) || 3;
         const qCount = parseInt(document.getElementById('q-count').value) || 5;
-        const qMark = parseInt(document.getElementById('q-mark').value) || 2;
+        appState.markPerQuestion = parseInt(document.getElementById('q-mark').value) || 2;
+        appState.totalMarks = qCount * appState.markPerQuestion;
 
-        if (!fileInput.files.length) {
-            alert("يرجى اختيار ملف PDF أولاً");
-            return;
-        }
+        if (!apiKey) { alert("يجب إدخال مفتاح الـ API ليعمل الذكاء الاصطناعي"); return; }
+        if (!fileInput.files.length) { alert("يرجى اختيار ملف PDF أولاً"); return; }
 
         btn.disabled = true;
-        statusEl.innerHTML = `الخطوة 1/2: جاري استخراج النص من صفحة ${startPage} إلى ${endPage}...`;
+        statusEl.innerHTML = `جاري قراءة الصفحات من ${startPage} إلى ${endPage}...`;
 
         try {
             const file = fileInput.files[0];
@@ -109,121 +129,125 @@
             const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
             let fullText = "";
 
-            // حماية من إدخال أرقام صفحات خاطئة
-            const maxPagesInPdf = pdf.numPages;
-            if (endPage > maxPagesInPdf) endPage = maxPagesInPdf;
-            if (startPage < 1 || startPage > endPage) {
-                throw new Error(`نطاق الصفحات غير منطقي. الملف يحتوي على ${maxPagesInPdf} صفحة فقط.`);
-            }
-
-            // قراءة الصفحات المحددة فقط
+            if (endPage > pdf.numPages) endPage = pdf.numPages;
             for (let i = startPage; i <= endPage; i++) {
                 const page = await pdf.getPage(i);
                 const textContent = await page.getTextContent();
                 fullText += textContent.items.map(item => item.str).join(" ") + " ";
             }
 
-            if (fullText.trim().length === 0) {
-                throw new Error("لم يتمكن المتصفح من استخراج نصوص. قد يكون الملف عبارة عن صور ممسوحة ضوئياً.");
-            }
+            if (fullText.trim().length === 0) throw new Error("الملف لا يحتوي على نصوص قابلة للقراءة.");
 
-            statusEl.innerHTML = `الخطوة 2/2: جاري الاتصال بالذكاء الاصطناعي لتأليف ${qCount} أسئلة... (انتظر قليلاً)`;
-
-            await generateQuizFromAI(fullText, qCount, qMark);
+            statusEl.innerHTML = `جاري توليد ${qCount} أسئلة...`;
+            await generateQuizFromAI(fullText, qCount, apiKey);
 
         } catch (error) {
-            statusEl.innerHTML = `<div class="error-text"><strong>تفاصيل الخطأ أثناء القراءة:</strong> ${error.message}</div>`;
+            statusEl.innerHTML = `<div class="error-text">${error.message}</div>`;
             btn.disabled = false;
         }
     }
 
-    async function generateQuizFromAI(extractedText, count, mark) {
-        const statusEl = document.getElementById('status-message');
-        const btn = document.getElementById('start-btn');
-
-        // تمرير عدد الأسئلة المطلوب ديناميكياً للذكاء الاصطناعي
-        const prompt = `
-        أنت معلم خبير. استخرج من النص التالي ${count} أسئلة اختيار من متعدد مهمة وتقيس الفهم.
-        يجب أن ترد فقط وفقط بصيغة مصفوفة JSON متوافقة، بدون أي حرف إضافي وبدون علامات Markdown.
-        مثال دقيق للمطلوب:
+    async function generateQuizFromAI(extractedText, count, apiKey) {
+        const prompt = `استخرج ${count} أسئلة اختيار من متعدد. رد فقط وفقط بمصفوفة JSON متوافقة:
         [{"id":1,"text":"السؤال؟","options":["أ","ب","ج","د"],"correct":0,"explanation":"التفسير"}]
-        
-        النص المستخرج من الكتاب:
-        ${extractedText.substring(0, 15000)}
-        `;
+        النص: ${extractedText.substring(0, 15000)}`;
 
         try {
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: prompt }] }]
-                })
+                body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
             });
 
             const data = await response.json();
+            if(data.error) throw new Error(data.error.message);
 
-            if(data.error) {
-                throw new Error(data.error.message);
-            }
+            const jsonMatch = data.candidates[0].content.parts[0].text.match(/\[[\s\S]*\]/);
+            if (!jsonMatch) throw new Error("شكل الرد غير متوافق");
 
-            let aiText = data.candidates[0].content.parts[0].text;
-
-            const jsonMatch = aiText.match(/\[[\s\S]*\]/);
-            if (!jsonMatch) {
-                throw new Error("شكل الرد من الخادم غير متوافق: " + aiText);
-            }
-
-            const questions = JSON.parse(jsonMatch[0]);
-
-            statusEl.innerHTML = "<span style='color: green;'>تم تأليف الامتحان بنجاح!</span>";
+            appState.questions = JSON.parse(jsonMatch[0]);
             
-            // تمرير الدرجة لدالة الرسم
-            renderQuiz(questions, mark);
+            // إخفاء لوحة المعلم وإظهار الامتحان للطالب
+            document.getElementById('setup-section').style.display = 'none';
+            document.getElementById('student-section').style.display = 'block';
+            renderQuiz();
 
         } catch (error) {
-            statusEl.innerHTML = `<div class="error-text"><strong>تفاصيل الخطأ من الـ API:</strong> ${error.message}</div>`;
-        } finally {
-            btn.disabled = false;
+            document.getElementById('status-message').innerHTML = `<div class="error-text">خطأ من الخادم: ${error.message}</div>`;
+            document.getElementById('start-btn').disabled = false;
         }
     }
 
-    function renderQuiz(questions, markPerQuestion) {
+    function renderQuiz() {
         const container = document.getElementById('quiz-container');
-        const totalMarks = questions.length * markPerQuestion;
-        
-        container.innerHTML = `
-            <div style="text-align:center; margin-top:30px; padding-bottom: 10px; border-bottom: 2px dashed var(--border);">
-                <h2 style="color:var(--primary); margin-bottom:5px;">امتحانك التفاعلي</h2>
-                <p style="color:var(--text-secondary); font-weight:600;">إجمالي الدرجات: ${totalMarks} درجة</p>
-            </div>
-        `;
+        container.innerHTML = '';
 
-        questions.forEach((q, index) => {
+        appState.questions.forEach((q, index) => {
             const qCard = document.createElement('div');
             qCard.className = 'question-card';
-
             let optionsHTML = '';
+            
             q.options.forEach((opt, optIndex) => {
                 optionsHTML += `
                     <label class="option-item">
-                        <input type="radio" name="q${q.id}" value="${optIndex}">
+                        <input type="radio" name="q${q.id}" value="${optIndex}" required>
                         ${opt}
-                    </label>
-                `;
+                    </label>`;
             });
 
             qCard.innerHTML = `
-                <div style="font-weight: bold; margin-bottom: 12px; display:flex; justify-content:space-between; align-items:flex-start;">
+                <div style="font-weight: bold; margin-bottom: 12px; display:flex; justify-content:space-between;">
                     <span>سؤال ${index + 1}: ${q.text}</span>
-                    <span style="color:var(--secondary); font-size:0.9rem; background:#ccfbf1; padding:2px 8px; border-radius:4px; white-space:nowrap; margin-right:10px;">
-                        ${markPerQuestion} درجات
-                    </span>
+                    <span style="color:var(--secondary);">${appState.markPerQuestion} درجات</span>
                 </div>
-                <div>${optionsHTML}</div>
-            `;
+                <div>${optionsHTML}</div>`;
             container.appendChild(qCard);
         });
+    }
+
+    // منطق التصحيح التلقائي
+    document.getElementById('quiz-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const studentName = document.getElementById('student-name').value.trim() || 'طالب زائر';
+        let studentScore = 0;
+        let reviewHTML = '<h3>مراجعة إجاباتك:</h3>';
+
+        appState.questions.forEach((q, index) => {
+            const selectedInput = document.querySelector(`input[name="q${q.id}"]:checked`);
+            const selectedValue = selectedInput ? parseInt(selectedInput.value) : -1;
+            
+            const isCorrect = selectedValue === q.correct;
+            if (isCorrect) studentScore += appState.markPerQuestion;
+
+            reviewHTML += `
+                <div style="margin-top: 15px; padding-bottom: 10px; border-bottom: 1px solid #ccc;">
+                    <p><strong>س ${index + 1}:</strong> ${q.text}</p>
+                    <p>إجابتك: <span class="${isCorrect ? 'correct-ans' : 'wrong-ans'}">${selectedValue !== -1 ? q.options[selectedValue] : 'لم يجب'}</span></p>
+                    ${!isCorrect ? `<p>الإجابة الصحيحة: <span class="correct-ans">${q.options[q.correct]}</span></p>` : ''}
+                    <p style="font-size: 0.9rem; color: #64748b; margin-top: 5px;">*التفسير: ${q.explanation}</p>
+                </div>`;
+        });
+
+        document.getElementById('student-section').style.display = 'none';
+        document.getElementById('result-section').style.display = 'block';
+        
+        document.getElementById('result-display').innerHTML = `
+            <h2>تم تسليم الامتحان يا ${studentName}</h2>
+            <div class="result-score">${studentScore} / ${appState.totalMarks}</div>
+            <p>تم التصحيح ورصد الدرجة بنجاح.</p>
+        `;
+        document.getElementById('review-container').innerHTML = reviewHTML;
+
+        // إرسال النتيجة للإدارة
+        sendResultsToAdmin(studentName, studentScore, appState.totalMarks);
+    });
+
+    // دالة إرسال النتيجة للإدارة (تُربط بـ Firebase لاحقاً)
+    function sendResultsToAdmin(name, score, total) {
+        console.log(`جارٍ إرسال بيانات الطالب: ${name} بدرجة ${score}/${total} إلى قاعدة البيانات...`);
+        // هنا يمكنك لاحقاً وضع كود Firebase مثل:
+        // db.collection("exam_results").add({ studentName: name, score: score, total: total, date: new Date() });
     }
 </script>
 </body>
