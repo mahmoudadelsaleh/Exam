@@ -21,6 +21,7 @@
         .btn:disabled { background: #94a3b8; cursor: not-allowed; }
         
         #status-message { font-weight: bold; color: var(--secondary); text-align: center; margin-top: 15px; }
+        .error-text { color: #dc2626; background: #fee2e2; padding: 10px; border-radius: 8px; font-size: 0.9rem; margin-top: 10px; text-align: right;}
         
         /* Quiz Styles */
         .question-card { background: var(--bg); border-radius: 8px; padding: 18px; margin-top: 20px; border-right: 4px solid var(--primary-light); }
@@ -34,7 +35,7 @@
 
 <div class="container">
     <header>
-        <h1>توليد الامتحانات من الـ PDF (نسخة فعلية)</h1>
+        <h1>توليد الامتحانات من الـ PDF</h1>
         <p>يتم قراءة الملف وبناء الأسئلة الحقيقية عبر الذكاء الاصطناعي</p>
     </header>
 
@@ -52,9 +53,8 @@
 </div>
 
 <script>
-    // ===== تنبيه هام: ضع مفتاحك هنا =====
+    // مفتاحك تم وضعه هنا
     const GEMINI_API_KEY = "AIzaSyAX2GhGYi0B2aqDcsQLpcEhaoFrGGErKZE"; 
-    // ===================================
 
     async function startProcess() {
         const fileInput = document.getElementById('file-upload');
@@ -65,36 +65,34 @@
             alert("يرجى اختيار ملف PDF أولاً");
             return;
         }
-        
-        if (GEMINI_API_KEY === "ضع_المفتاح_الخاص_بك_هنا") {
-            alert("خطأ: يجب عليك وضع مفتاح API الخاص بك في الكود أولاً لكي يعمل التوليد.");
-            return;
-        }
 
         btn.disabled = true;
-        statusEl.innerText = "الخطوة 1/2: جاري قراءة محتوى الملف بالكامل...";
+        statusEl.innerHTML = "الخطوة 1/2: جاري استخراج النص من الملف...";
 
         try {
-            // 1. قراءة الملف بالكامل
             const file = fileInput.files[0];
             const arrayBuffer = await file.arrayBuffer();
             const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
             let fullText = "";
             
-            // قراءة كل الصفحات (تم إلغاء حد الـ 3 صفحات)
-            for (let i = 1; i <= pdf.numPages; i++) {
+            // تحديد القراءة لأول 10 صفحات لتجنب تجاوز الحد المسموح للبيانات في الطلب الواحد
+            const maxPages = Math.min(pdf.numPages, 10);
+            for (let i = 1; i <= maxPages; i++) {
                 const page = await pdf.getPage(i);
                 const textContent = await page.getTextContent();
                 fullText += textContent.items.map(item => item.str).join(" ") + " ";
             }
 
-            statusEl.innerText = "الخطوة 2/2: جاري إرسال المحتوى للذكاء الاصطناعي لتأليف الامتحان... (قد يستغرق 15 ثانية)";
+            if (fullText.trim().length === 0) {
+                throw new Error("الملف يبدو كصور ممسوحة ضوئياً أو فارغ، لم يتمكن المتصفح من استخراج نصوص منه.");
+            }
 
-            // 2. إرسال النص لـ Gemini API لتوليد الأسئلة
+            statusEl.innerHTML = "الخطوة 2/2: جاري الاتصال بالذكاء الاصطناعي لتأليف الامتحان... (انتظر قليلاً)";
+
             await generateQuizFromAI(fullText);
 
         } catch (error) {
-            statusEl.innerText = "حدث خطأ: " + error.message;
+            statusEl.innerHTML = `<div class="error-text"><strong>تفاصيل الخطأ أثناء القراءة:</strong> ${error.message}</div>`;
             btn.disabled = false;
         }
     }
@@ -103,21 +101,14 @@
         const statusEl = document.getElementById('status-message');
         const btn = document.getElementById('start-btn');
 
-        // تحديد أمر دقيق للذكاء الاصطناعي ليُرجع البيانات بصيغة برمجية قابلة للقراءة
         const prompt = `
-        أنت معلم خبير. اقرأ النص التالي، وقم بتوليد 5 أسئلة اختيار من متعدد تغطي أهم المفاهيم الموجودة فيه.
-        يجب أن ترد فقط بصيغة مصفوفة JSON متوافقة، بدون أي نصوص أخرى أو تنسيقات Markdown، على هذا النحو:
-        [
-          {
-            "id": 1,
-            "text": "السؤال هنا",
-            "options": ["خيار 1", "خيار 2", "خيار 3", "خيار 4"],
-            "correct": 0,
-            "explanation": "التفسير"
-          }
-        ]
+        أنت معلم خبير. استخرج من النص التالي 5 أسئلة اختيار من متعدد مهمة.
+        يجب أن ترد فقط وفقط بصيغة مصفوفة JSON متوافقة، بدون أي حرف إضافي وبدون علامات Markdown.
+        مثال دقيق للمطلوب:
+        [{"id":1,"text":"السؤال؟","options":["أ","ب","ج","د"],"correct":0,"explanation":"التفسير"}]
+        
         النص:
-        ${extractedText.substring(0, 25000)} // تحديد حجم النص لتجنب تجاوز الحد المسموح
+        ${extractedText.substring(0, 15000)}
         `;
 
         try {
@@ -135,20 +126,21 @@
                 throw new Error(data.error.message);
             }
 
-            // استخراج النص البرمجي (JSON) من رد الذكاء الاصطناعي
             let aiText = data.candidates[0].content.parts[0].text;
             
-            // تنظيف الرد تحسباً لوجود تنسيقات ماركداون
-            aiText = aiText.replace(/```json/g, '').replace(/```/g, '').trim();
+            // استخراج كود الـ JSON فقط في حال كتب الذكاء الاصطناعي أي نصوص إضافية
+            const jsonMatch = aiText.match(/\[[\s\S]*\]/);
+            if (!jsonMatch) {
+                throw new Error("شكل الرد من الخادم غير متوافق: " + aiText);
+            }
+
+            const questions = JSON.parse(jsonMatch[0]);
             
-            const questions = JSON.parse(aiText);
-            
-            statusEl.innerText = "تم توليد الامتحان بنجاح!";
+            statusEl.innerHTML = "<span style='color: green;'>تم توليد الامتحان بنجاح!</span>";
             renderQuiz(questions);
 
         } catch (error) {
-            statusEl.innerText = "فشل في توليد الأسئلة من الذكاء الاصطناعي. تأكد من صحة الـ API Key.";
-            console.error(error);
+            statusEl.innerHTML = `<div class="error-text"><strong>تفاصيل الخطأ من الـ API:</strong> ${error.message}</div>`;
         } finally {
             btn.disabled = false;
         }
@@ -156,7 +148,7 @@
 
     function renderQuiz(questions) {
         const container = document.getElementById('quiz-container');
-        container.innerHTML = '<h2 style="color:var(--primary); text-align:center; margin-top:20px;">الامتحان المولد خصيصاً لك</h2>';
+        container.innerHTML = '<h2 style="color:var(--primary); text-align:center; margin-top:20px;">امتحانك التفاعلي</h2>';
         
         questions.forEach((q, index) => {
             const qCard = document.createElement('div');
