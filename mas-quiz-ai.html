@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة توليد الامتحانات الذكية | AI PDF Quiz Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --primary-light: #3b82f6;
+            --secondary: #0d9488;
+            --accent: #f59e0b;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text: #0f172a;
+            --text-secondary: #475569;
+            --border: #e2e8f0;
+            --success: #16a34a;
+            --error: #dc2626;
+            --radius-sm: 6px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 20px 10px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+        }
+
+        header h1 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        header p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            padding: 25px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+
+        .view-section {
+            display: none;
+        }
+
+        .view-section.active {
+            display: block;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.95rem;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 0.95rem;
+            background-color: var(--bg);
+            color: var(--text);
+            transition: var(--transition);
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+            background-color: var(--surface);
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 480px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 10px rgba(30, 58, 138, 0.2);
+        }
+
+        .btn:hover {
+            background-color: #152e72;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary);
+            box-shadow: 0 4px 10px rgba(13, 148, 136, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background-color: #0b7a70;
+        }
+
+        /* Loading Spinner */
+        .loading-container {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--border);
+            border-top: 5px solid var(--primary);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Quiz Layout */
+        .quiz-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+            border-bottom: 2px dashed var(--border);
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .question-card {
+            background: var(--bg);
+            border-radius: var(--radius-md);
+            padding: 18px;
+            margin-bottom: 20px;
+            border-right: 4px solid var(--primary-light);
+        }
+
+        .question-text {
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 1.05rem;
+        }
+
+        .options-list {
+            list-style: none;
+        }
+
+        .option-item {
+            display: block;
+            position: relative;
+            padding: 12px 40px 12px 12px;
+            margin-bottom: 10px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.95rem;
+        }
+
+        .option-item:hover {
+            border-color: var(--primary-light);
+            background-color: rgba(59, 130, 246, 0.02);
+        }
+
+        .option-item input {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary);
+        }
+
+        /* Results & Review */
+        .score-box {
+            text-align: center;
+            padding: 30px 15px;
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            color: white;
+            border-radius: var(--radius-md);
+            margin-bottom: 25px;
+        }
+
+        .score-num {
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 10px 0;
+            line-height: 1;
+        }
+
+        .review-card {
+            border-radius: var(--radius-md);
+            padding: 18px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+        }
+
+        .review-card.correct-ans {
+            border-right: 5px solid var(--success);
+            background-color: rgba(22, 163, 74, 0.01);
+        }
+
+        .review-card.wrong-ans {
+            border-right: 5px solid var(--error);
+            background-color: rgba(220, 38, 38, 0.01);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            border-radius: var(--radius-sm);
+            margin-bottom: 10px;
+        }
+
+        .status-badge.correct {
+            background-color: rgba(22, 163, 74, 0.1);
+            color: var(--success);
+        }
+
+        .status-badge.wrong {
+            background-color: rgba(220, 38, 38, 0.1);
+            color: var(--error);
+        }
+
+        .review-option {
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            border-radius: var(--radius-sm);
+            font-size: 0.95rem;
+            border: 1px solid var(--border);
+        }
+
+        .review-option.selected-wrong {
+            background-color: rgba(220, 38, 38, 0.1);
+            border-color: var(--error);
+            color: var(--error);
+            font-weight: 600;
+        }
+
+        .review-option.is-correct {
+            background-color: rgba(22, 163, 74, 0.1);
+            border-color: var(--success);
+            color: var(--success);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>المنصة الذكية لتوليد الامتحانات</h1>
+            <p>حوّل مذكراتك وكتب الـ PDF إلى اختبارات تفاعلية فورية مدعومة بالذكاء الاصطناعي</p>
+        </header>
+
+        <!-- VIEW 1: SETUP SECTION -->
+        <section id="view-setup" class="view-section active">
+            <div class="card">
+                <div class="form-group">
+                    <label for="pdf-url">رابط ملف الـ PDF المباشر</label>
+                    <input type="text" id="pdf-url" placeholder="https://example.com/document.pdf" value="https://example.com/math-book.pdf">
+                </div>
+
+                <div class="form-group">
+                    <label for="pdf-pages">تحديد نطاق الصفحات (اختياري)</label>
+                    <input type="text" id="pdf-pages" placeholder="مثال: 5-12 أو اكتب الكل" value="1-5">
+                </div>
+
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="questions-count">عدد الأسئلة المطلوبة</label>
+                        <input type="number" id="questions-count" min="1" max="20" value="5">
+                    </div>
+                    <div class="form-group">
+                        <label for="question-mark">الدرجة لكل سؤال</label>
+                        <input type="number" id="question-mark" min="1" value="2">
+                    </div>
+                </div>
+
+                <button class="btn" id="btn-generate">توليد الامتحان باستخدام الذكاء الاصطناعي</button>
+            </div>
+        </section>
+
+        <!-- VIEW 2: LOADING SECTION -->
+        <section id="view-loading" class="view-section">
+            <div class="card loading-container">
+                <div class="spinner"></div>
+                <h3 style="color: var(--primary); margin-bottom: 8px;">جاري قراءة وتحليل ملف الـ PDF...</h3>
+                <p style="color: var(--text-secondary); font-size: 0.9rem;">يقوم الذكاء الاصطناعي الآن بمعالجة النصوص واستخراج المسائل وتنسيق الخيارات والحلول الدقيقة.</p>
+            </div>
+        </section>
+
+        <!-- VIEW 3: QUIZ SECTION -->
+        <section id="view-quiz" class="view-section">
+            <div class="card">
+                <div class="quiz-meta">
+                    <div id="quiz-timer">الامتحان الحالي من الـ PDF</div>
+                    <div id="quiz-total-marks">إجمالي الدرجات: 0</div>
+                </div>
+
+                <form id="quiz-form">
+                    <div id="questions-container">
+                        <!-- Questions will be dynamically loaded here -->
+                    </div>
+                    <button type="submit" class="btn btn-secondary">إرسال الإجابات وإنهاء الامتحان</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- VIEW 4: RESULTS & REVIEW SECTION -->
+        <section id="view-results" class="view-section">
+            <div class="score-box">
+                <h3>نتيجتك الفخرية</h3>
+                <div class="score-num" id="final-score-display">0 / 0</div>
+                <p id="score-status-text">أداء ممتاز ومبهر!</p>
+            </div>
+
+            <h3 style="margin-bottom: 15px; color: var(--primary);">مراجعة وتصحيح الامتحان بالكامل:</h3>
+            <div id="review-container">
+                <!-- Detailed feedback will be loaded here -->
+            </div>
+
+            <button class="btn" id="btn-restart">توليد امتحان جديد من ملف آخر</button>
+        </section>
+    </div>
+
+    <script>
+        // Data Store for the Session
+        let appState = {
+            questionsCount: 5,
+            markPerQuestion: 2,
+            generatedQuestions: [],
+            userAnswers: {}
+        };
+
+        // DOM Elements
+        const views = {
+            setup: document.getElementById('view-setup'),
+            loading: document.getElementById('view-loading'),
+            quiz: document.getElementById('view-quiz'),
+            results: document.getElementById('view-results')
+        };
+
+        function switchView(viewName) {
+            Object.keys(views).forEach(key => {
+                views[key].classList.remove('active');
+            });
+            views[viewName].classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Mock Logic to simulate high-fidelity AI Parsing and processing
+        // (Perfect setup for later API backend linking)
+        function getMockQuestions(count, points) {
+            const pool = [
+                {
+                    id: 1,
+                    text: "إذا كانت المصفوفة أ من النظم 2×3، والمصفوفة ب من النظم 3×1، فإن المصفوفة (أ ب) تكون من النظم:",
+                    options: ["2×1", "3×3", "1×2", "2×3"],
+                    correct: 0,
+                    explanation: "شرط ضرب مصفوفتين أن يكون عدد أعمدة الأولى مساوياً لعدد صفوف الثانية، وتنتج مصفوفة بنظم (صفوف الأولى × أعمدة الثانية)، أي 2×1."
+                },
+                {
+                    id: 2,
+                    text: "متوسط معدل التغير للدالة د(س) = س² عندما تتغير س من س₁ إلى س₂ يُعطى بالقانون المشتق، بشرط أن قيمة الفترة الزمنية أو التغير (هـ) لا تساوي صفر. إذا كانت الدالة تتغير في الفترة [2, أ]، فإن 'أ' لا يمكن أن تساوي:",
+                    options: ["2", "0", "1", "-2"],
+                    correct: 0,
+                    explanation: "في حساب متوسط معدل التغير على الفترة [س₁، س₂]، يجب أن تكون س₁ ≠ س₂ لتجنب القسمة على صفر في مقام قانون المعدل، بالتالي أ ≠ 2."
+                },
+                {
+                    id: 3,
+                    text: "مجموعة حل المعادلة: س² + 9 = 0 في مجموعة الأعداد المركبة (ت) هي:",
+                    options: ["{3ت، -3ت}", "{3، -3}", "{9ت، -9ت}", "Ø"],
+                    correct: 0,
+                    explanation: "س² = -9 ومنها س = ± جذر(-9) = ± 3ت."
+                },
+                {
+                    id: 4,
+                    text: "إذا كانت النقطة جـ تقسم القطعة المستقيمة أ ب بنسبة 1:2 من الداخل، حيث أ(2، 3) و ب(5، 6)، فإن إحداثيات النقطة جـ هي:",
+                    options: ["(3، 4)", "(4، 5)", "(3.5، 4.5)", "(2.5، 3.5)"],
+                    correct: 0,
+                    explanation: "باستخدام قانون التقسيم من الداخل: س = (ل₁ س₁ + ل₂ س₂) / (ل₁ + ل₂) وبالمثل لـ ص، نجد أن الإحداثي الدقيق هو (3، 4)."
+                },
+                {
+                    id: 5,
+                    text: "نهاية الدالة (س² - 4) / (س - 2) عندما تقترب س من 2 تساوي:",
+                    options: ["4", "2", "0", "غير معينة"],
+                    correct: 0,
+                    explanation: "بالتحليل والاختصار: (س-2)(س+2)/(س-2) = س+2. بالتعويض المباشر عن س بـ 2 نجد أن الناتج يساوي 4."
+                }
+            ];
+            
+            // Slice based on user count request or loop
+            let result = [];
+            for(let i=0; i<count; i++) {
+                let template = pool[i % pool.length];
+                result.push({
+                    id: i + 1,
+                    text: template.text,
+                    options: [...template.options],
+                    correct: template.correct,
+                    explanation: template.explanation,
+                    points: points
+                });
+            }
+            return result;
+        }
+
+        // Event: Click Generate
+        document.getElementById('btn-generate').addEventListener('click', function() {
+            const url = document.getElementById('pdf-url').value.trim();
+            if(!url) {
+                alert('الرجاء إدخال رابط ملف الـ PDF أولاً');
+                return;
+            }
+
+            appState.questionsCount = parseInt(document.getElementById('questions-count').value) || 5;
+            appState.markPerQuestion = parseInt(document.getElementById('question-mark').value) || 2;
+
+            switchView('loading');
+
+            // Simulate the exact AI RAG processing delay
+            setTimeout(() => {
+                appState.generatedQuestions = getMockQuestions(appState.questionsCount, appState.markPerQuestion);
+                renderQuiz();
+                switchView('quiz');
+            }, 2500);
+        });
+
+        // Render Quiz Screen
+        function renderQuiz() {
+            const container = document.getElementById('questions-container');
+            container.innerHTML = '';
+            
+            document.getElementById('quiz-total-marks').innerText = `إجمالي الدرجات: ${appState.questionsCount * appState.markPerQuestion} درجة`;
+
+            appState.generatedQuestions.forEach((q, qIdx) => {
+                const qCard = document.createElement('div');
+                qCard.className = 'question-card';
+                
+                qCard.innerHTML = `
+                    <div class="question-text">سؤال ${q.id}: ${q.text} <span style="font-size:0.85rem; color:var(--text-secondary);">(${q.points} درجات)</span></div>
+                    <div class="options-list">
+                        ${q.options.map((opt, optIdx) => `
+                            <label class="option-item">
+                                <input type="radio" name="question-${q.id}" value="${optIdx}" required>
+                                ${opt}
+                            </label>
+                        `).join('')}
+                    </div>
+                `;
+                container.appendChild(qCard);
+            });
+        }
+
+        // Event: Submit Quiz
+        document.getElementById('quiz-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            let score = 0;
+            const totalScore = appState.questionsCount * appState.markPerQuestion;
+            
+            appState.generatedQuestions.forEach(q => {
+                const selected = document.querySelector(`input[name="question-${q.id}"]:checked`);
+                const answerVal = selected ? parseInt(selected.value) : -1;
+                appState.userAnswers[q.id] = answerVal;
+                
+                if(answerVal === q.correct) {
+                    score += q.points;
+                }
+            });
+
+            // Display Score
+            document.getElementById('final-score-display').innerText = `${score} / ${totalScore}`;
+            
+            // Performance text modifier
+            const percentage = (score / totalScore) * 100;
+            const statusTextText = document.getElementById('score-status-text');
+            if(percentage >= 85) statusTextText.innerText = 'أداء ممتاز ومبهر! استمر في هذا التفوق.';
+            else if(percentage >= 50) statusTextText.innerText = 'أداء جيد جداً! يمكنك مراجعة الأخطاء لرفع مستواك.';
+            else statusTextText.innerText = 'تحتاج إلى مراجعة الملف المقروء بشكل أعمق وإعادة المحاولة.';
+
+            renderReview();
+            switchView('results');
+        });
+
+        // Render Review Screen
+        function renderReview() {
+            const container = document.getElementById('review-container');
+            container.innerHTML = '';
+
+            appState.generatedQuestions.forEach(q => {
+                const userAns = appState.userAnswers[q.id];
+                const isCorrect = userAns === q.correct;
+                
+                const rCard = document.createElement('div');
+                rCard.className = `review-card ${isCorrect ? 'correct-ans' : 'wrong-ans'}`;
+                
+                rCard.innerHTML = `
+                    <div class="status-badge ${isCorrect ? 'correct' : 'wrong'}">
+                        ${isCorrect ? 'إجابة صحيحة' : 'إجابة خاطئة'}
+                    </div>
+                    <div class="question-text" style="margin-bottom:10px;">سؤال ${q.id}: ${q.text}</div>
+                    
+                    <div style="margin-bottom: 12px;">
+                        ${q.options.map((opt, optIdx) => {
+                            let cssClass = 'review-option';
+                            if (optIdx === q.correct) cssClass += ' is-correct';
+                            if (optIdx === userAns && !isCorrect) cssClass += ' selected-wrong';
+                            
+                            return `<div class="${cssClass}">${opt}</div>`;
+                        }).join('')}
+                    </div>
+                    
+                    <div style="font-size:0.9rem; background:var(--bg); padding:10px; border-radius:var(--radius-sm); border-right:3px solid var(--accent);">
+                        <strong>التفسير العلمي والحل الصحيح:</strong> ${q.explanation}
+                    </div>
+                `;
+                container.appendChild(rCard);
+            });
+        }
+
+        // Restart Event
+        document.getElementById('btn-restart').addEventListener('click', function() {
+            appState.userAnswers = {};
+            document.getElementById('quiz-form').reset();
+            switchView('setup');
+        });
+    </script>
+</body>
+</html>
