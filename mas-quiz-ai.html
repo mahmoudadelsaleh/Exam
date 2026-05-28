@@ -3,47 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>المنصة الذكية - نسخة الفحص والمراقبة</title>
+    <title>المنصة الذكية لتوليد وتصحيح الامتحانات</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root { 
-            --primary: #1e3a8a; --primary-light: #3b82f6; --secondary: #0d9488; 
-            --bg: #f8fafc; --surface: #ffffff; --text: #0f172a; --text-secondary: #64748b; 
-            --border: #e2e8f0; --success: #16a34a; --error: #dc2626; --accent: #f59e0b;
+            --primary: #1e3a8a; 
+            --primary-light: #3b82f6; 
+            --secondary: #0d9488; 
+            --bg: #f8fafc; 
+            --surface: #ffffff; 
+            --text: #0f172a; 
+            --text-secondary: #64748b; 
+            --border: #e2e8f0; 
+            --success: #16a34a; 
+            --error: #dc2626; 
+            --accent: #f59e0b;
             --radius: 12px; 
         }
-
+        
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
         body { background-color: var(--bg); color: var(--text); padding: 20px; line-height: 1.6; }
         .container { max-width: 800px; margin: 0 auto; }
-        header { text-align: center; margin-bottom: 20px; }
+        header { text-align: center; margin-bottom: 30px; }
         header h1 { color: var(--primary); font-weight: 700; margin-bottom: 5px; }
-
+        header p { color: var(--text-secondary); font-size: 0.95rem; }
+        
         .card { background: var(--surface); padding: 25px; border-radius: var(--radius); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); margin-bottom: 20px; border: 1px solid var(--border); }
+        .card h3 { color: var(--primary); margin-bottom: 15px; padding-bottom: 8px; border-bottom: 2px solid var(--border); }
         
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--primary); font-size: 0.95rem; }
-        input[type="file"], input[type="number"], input[type="password"], input[type="text"] { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; background-color: #f8fafc; }
+        input[type="file"], input[type="number"], input[type="password"], input[type="text"] { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-family: 'Cairo', sans-serif; background-color: #f8fafc; }
+        input:focus { outline: none; border-color: var(--primary-light); background-color: #fff; }
         
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
         @media (max-width: 480px) { .grid-2 { grid-template-columns: 1fr; } }
 
-        .btn { display: block; width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 20px; transition: 0.3s; }
+        .btn { display: block; width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 20px; transition: 0.3s; text-align: center; }
+        .btn:hover { background: #152e72; }
         .btn-success { background: var(--secondary); }
+        .btn-success:hover { background: #0b7a70; }
         .btn:disabled { background: #94a3b8; cursor: not-allowed; }
 
         #status-message { font-weight: bold; color: var(--secondary); text-align: center; margin-top: 15px; }
-        .error-text { color: var(--error); background: #fee2e2; padding: 12px; border-radius: 8px; font-size: 0.9rem; margin-top: 10px; border-right: 4px solid var(--error); }
-
-        /* Monitor / Debug Console Styles */
-        .monitor-box { background: #1e293b; color: #10b981; padding: 15px; border-radius: 8px; margin-top: 20px; font-family: monospace; font-size: 0.85rem; direction: ltr; text-align: left; overflow: hidden; }
-        .monitor-title { color: #cbd5e1; border-bottom: 1px solid #475569; padding-bottom: 5px; margin-bottom: 10px; text-align: right; direction: rtl; font-family: 'Cairo'; font-weight: bold;}
-        .monitor-textarea { width: 100%; height: 100px; background: #0f172a; color: #cbd5e1; border: 1px solid #475569; padding: 8px; margin-top: 10px; border-radius: 4px; resize: vertical; direction: rtl; }
+        .error-text { color: var(--error); background: #fee2e2; padding: 12px; border-radius: 8px; font-size: 0.9rem; margin-top: 10px; text-align: right; border-right: 4px solid var(--error); }
 
         /* Quiz UI */
         .question-card { background: var(--bg); border-radius: 8px; padding: 18px; margin-top: 20px; border-right: 4px solid var(--primary-light); }
-        .option-item { display: block; padding: 12px; margin-bottom: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; }
-        .option-item input { margin-left: 10px; width: 18px; height: 18px;}
+        .option-item { display: block; padding: 12px; margin-bottom: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; transition: 0.2s; }
+        .option-item:hover { border-color: var(--primary-light); background: #eff6ff; }
+        .option-item input { margin-left: 10px; accent-color: var(--primary); }
+        
+        /* Result & Review UI */
+        .result-box { text-align: center; padding: 30px; background: #e0f2fe; border-radius: var(--radius); margin-top: 20px; border: 2px solid var(--primary-light); }
+        .result-score { font-size: 3rem; font-weight: bold; color: var(--primary); margin: 10px 0; }
+        
+        .review-card { border-radius: 8px; padding: 18px; margin-top: 15px; border: 1px solid var(--border); background: var(--surface); }
+        .review-card.correct-ans { border-right: 5px solid var(--success); }
+        .review-card.wrong-ans { border-right: 5px solid var(--error); }
+        
+        .status-badge { display: inline-block; padding: 4px 10px; font-size: 0.8rem; font-weight: 700; border-radius: 4px; margin-bottom: 10px; }
+        .status-badge.correct { background-color: rgba(22, 163, 74, 0.1); color: var(--success); }
+        .status-badge.wrong { background-color: rgba(220, 38, 38, 0.1); color: var(--error); }
+
+        .review-option { padding: 10px; margin-bottom: 6px; border-radius: 6px; border: 1px solid var(--border); font-size: 0.95rem; }
+        .review-option.is-correct { background-color: rgba(22, 163, 74, 0.1); border-color: var(--success); color: var(--success); font-weight: 600; }
+        .review-option.selected-wrong { background-color: rgba(220, 38, 38, 0.1); border-color: var(--error); color: var(--error); font-weight: 600; }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
     <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';</script>
@@ -52,191 +77,240 @@
 
 <div class="container">
     <header>
-        <h1>المنصة الذكية (نسخة الفحص)</h1>
+        <h1>المنصة التعليمية الذكية</h1>
+        <p>توليد وتصحيح الامتحانات تلقائياً من الكتب والمذكرات باستخدام الذكاء الاصطناعي</p>
     </header>
 
     <div class="card" id="setup-section">
+        <h3>لوحة تحكم المعلم (تجهيز الامتحان)</h3>
+        
         <div class="form-group">
-            <label>مفتاح API الخاص بك:</label>
-            <input type="password" id="api-key" placeholder="ألصق مفتاح Gemini هنا وسيتم حفظه تلقائياً...">
+            <label>مفتاح API الخاص بك (آمن - لا يتم حفظه في الكود):</label>
+            <input type="password" id="api-key" placeholder="ألصق مفتاح Gemini الجديد هنا لضمان استمراره...">
         </div>
 
         <div class="form-group" style="margin-bottom: 20px;">
             <label>اختر ملف الـ PDF العلمي:</label>
             <input type="file" id="file-upload" accept="application/pdf">
-            <div id="file-quick-info" style="margin-top: 8px; font-size: 0.9rem; font-weight: bold; color: var(--primary);"></div>
         </div>
 
         <div class="grid-2">
-            <div class="form-group"><label>قراءة من صفحة:</label><input type="number" id="start-page" value="1" min="1"></div>
-            <div class="form-group"><label>إلى صفحة:</label><input type="number" id="end-page" value="3" min="1"></div>
+            <div class="form-group"><label>قراءة من صفحة رقم:</label><input type="number" id="start-page" value="1" min="1"></div>
+            <div class="form-group"><label>إلى صفحة رقم:</label><input type="number" id="end-page" value="3" min="1"></div>
         </div>
         <div class="grid-2">
-            <div class="form-group"><label>عدد الأسئلة:</label><input type="number" id="q-count" value="5" min="1"></div>
-            <div class="form-group"><label>درجة السؤال:</label><input type="number" id="q-mark" value="2" min="1"></div>
+            <div class="form-group"><label>عدد الأسئلة المطلوبة:</label><input type="number" id="q-count" value="5" min="1" max="30"></div>
+            <div class="form-group"><label>الدرجة لكل سؤال:</label><input type="number" id="q-mark" value="2" min="1"></div>
         </div>
-
-        <button class="btn" id="start-btn" onclick="startProcess()">استخراج وتوليد الامتحان</button>
         
+        <button class="btn" id="start-btn" onclick="startProcess()">استخراج المحتوى وبناء الامتحان فوراً</button>
         <div id="status-message"></div>
-
-        <div class="monitor-box" id="monitor-panel" style="display: none;">
-            <div class="monitor-title">شاشة مراقبة العمليات (Debug Console)</div>
-            <div id="monitor-log">Waiting for action...</div>
-            <textarea id="monitor-extracted-text" class="monitor-textarea" readonly placeholder="سيظهر النص المستخرج هنا..."></textarea>
-        </div>
     </div>
 
     <div id="student-section" style="display: none;">
         <div class="card">
             <h3>واجهة الطالب للاختبار</h3>
+            <div class="form-group">
+                <label>اسم الطالب بالكامل:</label>
+                <input type="text" id="student-name" placeholder="اكتب اسمك الثلاثي لبدء الحل...">
+            </div>
             <form id="quiz-form">
                 <div id="quiz-container"></div>
-                <button type="submit" class="btn btn-success">إنهاء وتسليم الامتحان</button>
+                <button type="submit" class="btn btn-success" id="submit-quiz-btn">إنهاء وتسليم الامتحان</button>
             </form>
         </div>
+    </div>
+
+    <div id="result-section" style="display: none;">
+        <div class="result-box" id="result-display"></div>
+        
+        <h3 style="margin-top: 30px; margin-bottom: 10px; color: var(--primary);">تقرير تفصيلي بالإجابات النموذجية والتفسير العلمي:</h3>
+        <div id="review-container"></div>
+        
+        <button class="btn" onclick="window.location.reload()">إنشاء امتحان جديد</button>
     </div>
 </div>
 
 <script>
-    let appState = { questions: [], markPerQuestion: 2, totalMarks: 0 };
-
-    window.onload = () => {
-        const savedKey = localStorage.getItem('gemini_api_key_saved');
-        if (savedKey) document.getElementById('api-key').value = savedKey;
+    let appState = {
+        questions: [],
+        markPerQuestion: 2,
+        totalMarks: 0
     };
-
-    // 1. فحص الملف فور اختياره (قبل الضغط على الزر)
-    document.getElementById('file-upload').addEventListener('change', async function(e) {
-        const infoDiv = document.getElementById('file-quick-info');
-        if(!e.target.files.length) {
-            infoDiv.innerHTML = ''; return;
-        }
-        infoDiv.innerHTML = '<span style="color: #f59e0b;">جاري فحص الملف...</span>';
-        
-        try {
-            const file = e.target.files[0];
-            const arrayBuffer = await file.arrayBuffer();
-            const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
-            infoDiv.innerHTML = `<span style="color: var(--success);">✔ الملف سليم. إجمالي الصفحات: ${pdf.numPages} صفحة.</span>`;
-            document.getElementById('end-page').value = Math.min(3, pdf.numPages);
-        } catch (err) {
-            infoDiv.innerHTML = `<span style="color: var(--error);">✖ لا يمكن قراءة الملف، قد يكون تالفاً أو محمياً: ${err.message}</span>`;
-        }
-    });
-
-    function logMonitor(msg) {
-        const logDiv = document.getElementById('monitor-log');
-        logDiv.innerHTML += `> ${msg}<br>`;
-        console.log(msg); // Also log to browser console
-    }
 
     async function startProcess() {
         const apiKey = document.getElementById('api-key').value.trim();
         const fileInput = document.getElementById('file-upload');
         const statusEl = document.getElementById('status-message');
         const btn = document.getElementById('start-btn');
-        const monitorPanel = document.getElementById('monitor-panel');
-        const monitorText = document.getElementById('monitor-extracted-text');
         
         const startPage = parseInt(document.getElementById('start-page').value) || 1;
         let endPage = parseInt(document.getElementById('end-page').value) || 3;
         const qCount = parseInt(document.getElementById('q-count').value) || 5;
         appState.markPerQuestion = parseInt(document.getElementById('q-mark').value) || 2;
+        appState.totalMarks = qCount * appState.markPerQuestion;
 
-        statusEl.innerHTML = ""; 
-        monitorPanel.style.display = "block";
-        document.getElementById('monitor-log').innerHTML = ""; // Clear logs
-        monitorText.value = "";
+        if (!apiKey) { alert("برجاء إدخال مفتاح الـ API أولاً لربط الذكاء الاصطناعي."); return; }
+        if (!fileInput.files.length) { alert("برجاء إرفاق ملف PDF للبدء."); return; }
 
-        if (!apiKey) { logMonitor("Error: API Key missing"); statusEl.innerHTML = `<div class="error-text">أدخل المفتاح أولاً.</div>`; return; }
-        if (!fileInput.files.length) { logMonitor("Error: No file selected"); statusEl.innerHTML = `<div class="error-text">أرفق الملف أولاً.</div>`; return; }
-
-        localStorage.setItem('gemini_api_key_saved', apiKey);
         btn.disabled = true;
+        statusEl.innerHTML = `الخطوة 1/2: جاري استخراج الحروف والنصوص من صفحة ${startPage} إلى ${endPage}...`;
 
         try {
-            logMonitor("Starting PDF processing...");
             const file = fileInput.files[0];
             const arrayBuffer = await file.arrayBuffer();
             const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
-            
-            logMonitor(`PDF Loaded. Total pages: ${pdf.numPages}. Target range: ${startPage} to ${endPage}`);
+            let fullText = "";
 
             if (endPage > pdf.numPages) endPage = pdf.numPages;
-            
-            let fullText = "";
+            if (startPage > endPage || startPage < 1) {
+                throw new Error(`نطاق الصفحات المدخل غير صحيح، الملف يحتوي على ${pdf.numPages} صفحة فقط.`);
+            }
+
             for (let i = startPage; i <= endPage; i++) {
-                logMonitor(`Extracting text from page ${i}...`);
                 const page = await pdf.getPage(i);
                 const textContent = await page.getTextContent();
-                const pageText = textContent.items.map(item => item.str).join(" ");
-                fullText += pageText + " \n";
+                fullText += textContent.items.map(item => item.str).join(" ") + " ";
             }
 
             if (fullText.trim().length === 0) {
-                throw new Error("Text extraction resulted in 0 characters. The PDF might be scanned images.");
+                throw new Error("فشل المتصفح في العثور على نصوص قابلة للقراءة. تأكد أن الملف ليس عبارة عن صور صامتة.");
             }
 
-            logMonitor(`Extraction Complete! Total extracted length: ${fullText.length} characters.`);
-            monitorText.value = fullText; // عرض النص للمستخدم
-
-            logMonitor("Sending payload to Gemini API...");
-            statusEl.innerHTML = `<span style="color: var(--secondary);">تم استخراج النص (${fullText.length} حرف). جاري تأليف الامتحان...</span>`;
-            
+            statusEl.innerHTML = `الخطوة 2/2: جاري إرسال البيانات ومعالجتها عبر خوادم وموديل Gemini 2.5 Flash وتأليف الامتحان...`;
             await generateQuizFromAI(fullText, qCount, apiKey);
 
         } catch (error) {
-            logMonitor(`CRITICAL ERROR: ${error.message}`);
-            statusEl.innerHTML = `<div class="error-text"><strong>تفاصيل التوقف:</strong> ${error.message}</div>`;
+            statusEl.innerHTML = `<div class="error-text"><strong>حدث خطأ أثناء المعالجة:</strong> ${error.message}</div>`;
             btn.disabled = false;
         }
     }
 
     async function generateQuizFromAI(extractedText, count, apiKey) {
-        const btn = document.getElementById('start-btn');
-        const prompt = `استخرج ${count} أسئلة اختيار من متعدد هادفة. الرد يجب أن يكون JSON فقط وفقط كالتالي:
-        [{"id":1,"text":"سؤال؟","options":["أ","ب","ج","د"],"correct":0,"explanation":"شرح"}]
-        النص: ${extractedText.substring(0, 18000)}`;
+        const prompt = `
+        أنت معلم خبير وموجه أصيل. استخرج من النص العلمي التالي بدقة متناهية ${count} أسئلة اختيار من متعدد هادفة وممتازة.
+        يجب أن يكون الرد الخاص بك عبارة عن مصفوفة JSON نقية ومتوافقة فقط وفقط، بدون استخدام علامات الماركداون (```json) وبدون نصوص ترحيبية قبل أو بعد المصفوفة البرمجية.
+        تنسيق الـ JSON المطلوب بدقة:
+        [{"id":1,"text":"نص السؤال هنا؟","options":["خيار أ","خيار ب","خيار ج","خيار د"],"correct":0,"explanation":"التفسير العلمي والدقيق لإجابة السؤال"}]
+        
+        ملاحظة: حقل "correct" يمثل رقم مؤشر الإجابة الصحيحة في المصفوفة (يبدأ من 0 للخيارات الأولى).
+        
+        النص المستخرج:
+        ${extractedText.substring(0, 18000)}`;
 
         try {
+            // استخدام الرابط المحدث والفعال لموديل gemini-2.5-flash
             const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
             });
 
-            logMonitor(`Received API Response. Status: ${response.status}`);
-            
             const data = await response.json();
-            if(data.error) throw new Error(`API Error: ${data.error.message}`);
+            if(data.error) throw new Error(data.error.message);
 
             let rawText = data.candidates[0].content.parts[0].text;
-            logMonitor("AI Response text received successfully. Parsing JSON...");
-            
             const jsonMatch = rawText.match(/\[[\s\S]*\]/);
-            if (!jsonMatch) throw new Error("AI did not return valid JSON array.");
+            if (!jsonMatch) throw new Error("استجابة الخادم غير متوافقة مع التنسيق البرمجي المتوقع.");
 
             appState.questions = JSON.parse(jsonMatch[0]);
-            logMonitor(`Successfully parsed ${appState.questions.length} questions!`);
             
+            // التبديل لواجهة حل الطالب
             document.getElementById('setup-section').style.display = 'none';
             document.getElementById('student-section').style.display = 'block';
             renderQuiz();
 
         } catch (error) {
-            logMonitor(`API/PARSING ERROR: ${error.message}`);
-            document.getElementById('status-message').innerHTML = `<div class="error-text">خطأ التوليد: ${error.message}</div>`;
-            btn.disabled = false;
+            document.getElementById('status-message').innerHTML = `<div class="error-text"><strong>تفاصيل خطأ الـ API:</strong> ${error.message}</div>`;
+            document.getElementById('start-btn').disabled = false;
         }
     }
 
     function renderQuiz() {
         const container = document.getElementById('quiz-container');
         container.innerHTML = '';
+
         appState.questions.forEach((q, index) => {
             const qCard = document.createElement('div');
             qCard.className = 'question-card';
             let optionsHTML = '';
+            
             q.options.forEach((opt, optIndex) => {
-                optionsHTML += `<label class="option-item"><input type="radio" name="
+                optionsHTML += `
+                    <label class="option-item">
+                        <input type="radio" name="q${q.id}" value="${optIndex}" required>
+                        ${opt}
+                    </label>`;
+            });
+
+            qCard.innerHTML = `
+                <div style="font-weight: bold; margin-bottom: 12px; display:flex; justify-content:space-between; align-items: flex-start;">
+                    <span>سؤال ${index + 1}: ${q.text}</span>
+                    <span style="color:var(--secondary); background:#ccfbf1; padding:2px 8px; border-radius:4px; font-size:0.85rem; white-space:nowrap; margin-right:10px;">
+                        ${appState.markPerQuestion} درجات
+                    </span>
+                </div>
+                <div>${optionsHTML}</div>`;
+            container.appendChild(qCard);
+        });
+    }
+
+    // تصحيح فوري وعرض تفصيلي
+    document.getElementById('quiz-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const studentName = document.getElementById('student-name').value.trim() || 'طالب زائر';
+        let studentScore = 0;
+        let reviewHTML = '';
+
+        appState.questions.forEach((q, index) => {
+            const selectedInput = document.querySelector(`input[name="q${q.id}"]:checked`);
+            const selectedValue = selectedInput ? parseInt(selectedInput.value) : -1;
+            const isCorrect = selectedValue === q.correct;
+            
+            if (isCorrect) studentScore += appState.markPerQuestion;
+
+            reviewHTML += `
+                <div class="review-card ${isCorrect ? 'correct-ans' : 'wrong-ans'}">
+                    <div class="status-badge ${isCorrect ? 'correct' : 'wrong'}">
+                        ${isCorrect ? 'إجابة صحيحة' : 'إجابة خاطئة'}
+                    </div>
+                    <p style="font-weight:600; margin-bottom:10px;"><strong>س ${index + 1}:</strong> ${q.text}</p>
+                    <div>
+                        ${q.options.map((opt, optIdx) => {
+                            let optClass = 'review-option';
+                            if (optIdx === q.correct) optClass += ' is-correct';
+                            if (optIdx === selectedValue && !isCorrect) optClass += ' selected-wrong';
+                            return `<div class="${optClass}">${opt}</div>`;
+                        }).join('')}
+                    </div>
+                    <p style="font-size: 0.9rem; color: var(--text-secondary); background: #f1f5f9; padding: 8px; border-radius: 6px; margin-top: 10px; border-right:3px solid var(--accent);">
+                        <strong>التفسير والشرح:</strong> ${q.explanation}
+                    </p>
+                </div>`;
+        });
+
+        document.getElementById('student-section').style.display = 'none';
+        document.getElementById('result-section').style.display = 'block';
+        
+        document.getElementById('result-display').innerHTML = `
+            <h2>تم تسليم ورقة الإجابة بنجاح</h2>
+            <p style="margin-top:5px; font-weight:600; color:var(--text-secondary);">اسم الطالب: ${studentName}</p>
+            <div class="result-score">${studentScore} / ${appState.totalMarks}</div>
+            <p>نسبة النجاح والأداء رُصدت تلقائياً.</p>
+        `;
+        document.getElementById('review-container').innerHTML = reviewHTML;
+
+        // إرسال النتيجة للإدارة
+        sendResultsToAdmin(studentName, studentScore, appState.totalMarks);
+    });
+
+    // دالة إرسال ورصد النتيجة في الإدارة (جاهزة للربط بـ Firebase لاحقاً)
+    function sendResultsToAdmin(name, score, total) {
+        console.log(`تم رصد نتيجة الطالب برمجياً في الإدارة -> الاسم: ${name} | الدرجة: ${score}/${total}`);
+        // للربط بـ Firebase مستقبلاً:
+        // db.collection("results").add({ name: name, score: score, total: total, date: new Date() });
+    }
+</script>
+</body>
+</html>
