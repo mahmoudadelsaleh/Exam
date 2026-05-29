@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>المنصة الذكية لتوليد وتصحيح الامتحانات</title>
+    <title>المنصة الذكية لتوليد وتصحيح الامتحانات - النظام المتكامل</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root { 
@@ -20,22 +20,22 @@
             --accent: #f59e0b;
             --radius: 12px; 
         }
-        
+
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
         body { background-color: var(--bg); color: var(--text); padding: 20px; line-height: 1.6; }
         .container { max-width: 800px; margin: 0 auto; }
         header { text-align: center; margin-bottom: 30px; }
         header h1 { color: var(--primary); font-weight: 700; margin-bottom: 5px; }
         header p { color: var(--text-secondary); font-size: 0.95rem; }
-        
+
         .card { background: var(--surface); padding: 25px; border-radius: var(--radius); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); margin-bottom: 20px; border: 1px solid var(--border); }
         .card h3 { color: var(--primary); margin-bottom: 15px; padding-bottom: 8px; border-bottom: 2px solid var(--border); }
-        
+
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--primary); font-size: 0.95rem; }
         input[type="file"], input[type="number"], input[type="password"], input[type="text"] { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-family: 'Cairo', sans-serif; background-color: #f8fafc; }
         input:focus { outline: none; border-color: var(--primary-light); background-color: #fff; }
-        
+
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
         @media (max-width: 480px) { .grid-2 { grid-template-columns: 1fr; } }
 
@@ -47,21 +47,22 @@
 
         #status-message { font-weight: bold; color: var(--secondary); text-align: center; margin-top: 15px; }
         .error-text { color: var(--error); background: #fee2e2; padding: 12px; border-radius: 8px; font-size: 0.9rem; margin-top: 10px; text-align: right; border-right: 4px solid var(--error); }
+        .success-text { color: var(--success); background: #dcfce7; padding: 12px; border-radius: 8px; font-size: 0.9rem; margin-top: 10px; text-align: right; border-right: 4px solid var(--success); }
 
         /* Quiz UI */
         .question-card { background: var(--bg); border-radius: 8px; padding: 18px; margin-top: 20px; border-right: 4px solid var(--primary-light); }
         .option-item { display: block; padding: 12px; margin-bottom: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; transition: 0.2s; }
         .option-item:hover { border-color: var(--primary-light); background: #eff6ff; }
         .option-item input { margin-left: 10px; accent-color: var(--primary); }
-        
+
         /* Result & Review UI */
         .result-box { text-align: center; padding: 30px; background: #e0f2fe; border-radius: var(--radius); margin-top: 20px; border: 2px solid var(--primary-light); }
         .result-score { font-size: 3rem; font-weight: bold; color: var(--primary); margin: 10px 0; }
-        
+
         .review-card { border-radius: 8px; padding: 18px; margin-top: 15px; border: 1px solid var(--border); background: var(--surface); }
         .review-card.correct-ans { border-right: 5px solid var(--success); }
         .review-card.wrong-ans { border-right: 5px solid var(--error); }
-        
+
         .status-badge { display: inline-block; padding: 4px 10px; font-size: 0.8rem; font-weight: 700; border-radius: 4px; margin-bottom: 10px; }
         .status-badge.correct { background-color: rgba(22, 163, 74, 0.1); color: var(--success); }
         .status-badge.wrong { background-color: rgba(220, 38, 38, 0.1); color: var(--error); }
@@ -69,6 +70,9 @@
         .review-option { padding: 10px; margin-bottom: 6px; border-radius: 6px; border: 1px solid var(--border); font-size: 0.95rem; }
         .review-option.is-correct { background-color: rgba(22, 163, 74, 0.1); border-color: var(--success); color: var(--success); font-weight: 600; }
         .review-option.selected-wrong { background-color: rgba(220, 38, 38, 0.1); border-color: var(--error); color: var(--error); font-weight: 600; }
+
+        .loading-spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,.3); border-radius: 50%; border-top-color: white; animation: spin 1s ease-in-out infinite; margin-right: 10px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
     <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';</script>
@@ -77,57 +81,72 @@
 
 <div class="container">
     <header>
-        <h1>المنصة التعليمية الذكية</h1>
-        <p>توليد وتصحيح الامتحانات تلقائياً من الكتب والمذكرات باستخدام الذكاء الاصطناعي</p>
+        <h1>🎓 المنصة التعليمية الذكية</h1>
+        <p>توليد وتصحيح الامتحانات تلقائياً من الكتب والمذكرات باستخدام الذكاء الاصطناعي (Gemini 1.5 Flash)</p>
     </header>
 
+    <!-- قسم إعداد الامتحان (المعلم) -->
     <div class="card" id="setup-section">
-        <h3>لوحة تحكم المعلم (تجهيز الامتحان)</h3>
-        
+        <h3>📚 لوحة تحكم المعلم - تجهيز الامتحان</h3>
+
         <div class="form-group">
-            <label>مفتاح API الخاص بك (آمن - لا يتم حفظه في الكود):</label>
-            <input type="password" id="api-key" placeholder="ألصق مفتاح Gemini الجديد هنا لضمان استمراره...">
+            <label>🔑 مفتاح Google Gemini API:</label>
+            <input type="password" id="api-key" placeholder="أدخل مفتاح API من Google AI Studio (مثال: AIzaSy...)">
+            <small style="color: var(--text-secondary); display: block; margin-top: 5px;">⚠️ احصل على مفتاح مجاني من <a href="https://aistudio.google.com/apikey" target="_blank">Google AI Studio</a></small>
         </div>
 
-        <div class="form-group" style="margin-bottom: 20px;">
-            <label>اختر ملف الـ PDF العلمي:</label>
+        <div class="form-group">
+            <label>📄 اختر ملف PDF العلمي:</label>
             <input type="file" id="file-upload" accept="application/pdf">
         </div>
 
         <div class="grid-2">
-            <div class="form-group"><label>قراءة من صفحة رقم:</label><input type="number" id="start-page" value="1" min="1"></div>
-            <div class="form-group"><label>إلى صفحة رقم:</label><input type="number" id="end-page" value="3" min="1"></div>
-        </div>
-        <div class="grid-2">
-            <div class="form-group"><label>عدد الأسئلة المطلوبة:</label><input type="number" id="q-count" value="5" min="1" max="30"></div>
-            <div class="form-group"><label>الدرجة لكل سؤال:</label><input type="number" id="q-mark" value="2" min="1"></div>
+            <div class="form-group">
+                <label>📖 قراءة من صفحة:</label>
+                <input type="number" id="start-page" value="1" min="1">
+            </div>
+            <div class="form-group">
+                <label>📖 إلى صفحة:</label>
+                <input type="number" id="end-page" value="5" min="1">
+            </div>
         </div>
         
-        <button class="btn" id="start-btn" onclick="startProcess()">استخراج المحتوى وبناء الامتحان فوراً</button>
+        <div class="grid-2">
+            <div class="form-group">
+                <label>❓ عدد الأسئلة:</label>
+                <input type="number" id="q-count" value="5" min="1" max="20">
+            </div>
+            <div class="form-group">
+                <label>⭐ درجة كل سؤال:</label>
+                <input type="number" id="q-mark" value="2" min="1">
+            </div>
+        </div>
+
+        <button class="btn" id="start-btn">🚀 استخراج المحتوى وإنشاء الامتحان</button>
         <div id="status-message"></div>
     </div>
 
+    <!-- قسم حل الطالب -->
     <div id="student-section" style="display: none;">
         <div class="card">
-            <h3>واجهة الطالب للاختبار</h3>
+            <h3>✍️ واجهة الطالب - أداء الاختبار</h3>
             <div class="form-group">
-                <label>اسم الطالب بالكامل:</label>
-                <input type="text" id="student-name" placeholder="اكتب اسمك الثلاثي لبدء الحل...">
+                <label>👤 اسم الطالب ثلاثياً:</label>
+                <input type="text" id="student-name" placeholder="مثال: أحمد محمد عبدالله">
             </div>
             <form id="quiz-form">
                 <div id="quiz-container"></div>
-                <button type="submit" class="btn btn-success" id="submit-quiz-btn">إنهاء وتسليم الامتحان</button>
+                <button type="submit" class="btn btn-success" id="submit-quiz-btn">📤 إنهاء وتسليم الامتحان</button>
             </form>
         </div>
     </div>
 
+    <!-- قسم النتائج والمراجعة -->
     <div id="result-section" style="display: none;">
         <div class="result-box" id="result-display"></div>
-        
-        <h3 style="margin-top: 30px; margin-bottom: 10px; color: var(--primary);">تقرير تفصيلي بالإجابات النموذجية والتفسير العلمي:</h3>
+        <h3 style="margin-top: 30px; margin-bottom: 10px; color: var(--primary);">📋 التقرير التفصيلي والإجابات النموذجية:</h3>
         <div id="review-container"></div>
-        
-        <button class="btn" onclick="window.location.reload()">إنشاء امتحان جديد</button>
+        <button class="btn" onclick="window.location.reload()">🔄 إنشاء امتحان جديد</button>
     </div>
 </div>
 
@@ -138,23 +157,41 @@
         totalMarks: 0
     };
 
+    // ربط حدث الزر
+    document.getElementById('start-btn').addEventListener('click', startProcess);
+
     async function startProcess() {
         const apiKey = document.getElementById('api-key').value.trim();
         const fileInput = document.getElementById('file-upload');
         const statusEl = document.getElementById('status-message');
         const btn = document.getElementById('start-btn');
-        
+
         const startPage = parseInt(document.getElementById('start-page').value) || 1;
-        let endPage = parseInt(document.getElementById('end-page').value) || 3;
+        let endPage = parseInt(document.getElementById('end-page').value) || 5;
         const qCount = parseInt(document.getElementById('q-count').value) || 5;
         appState.markPerQuestion = parseInt(document.getElementById('q-mark').value) || 2;
         appState.totalMarks = qCount * appState.markPerQuestion;
 
-        if (!apiKey) { alert("برجاء إدخال مفتاح الـ API أولاً لربط الذكاء الاصطناعي."); return; }
-        if (!fileInput.files.length) { alert("برجاء إرفاق ملف PDF للبدء."); return; }
+        // التحقق من المدخلات
+        if (!apiKey) { 
+            showError("برجاء إدخال مفتاح API الصالح من Google AI Studio أولاً."); 
+            return; 
+        }
+        
+        if (!fileInput.files.length) { 
+            showError("برجاء اختيار ملف PDF للبدء في إنشاء الامتحان."); 
+            return; 
+        }
+
+        // التحقق من صحة مفتاح API بشكل مبدئي
+        if (!apiKey.startsWith('AIza')) {
+            showError("⚠️ مفتاح API غير صحيح! يجب أن يبدأ بـ 'AIza' (من Google AI Studio)");
+            return;
+        }
 
         btn.disabled = true;
-        statusEl.innerHTML = `الخطوة 1/2: جاري استخراج الحروف والنصوص من صفحة ${startPage} إلى ${endPage}...`;
+        btn.innerHTML = '<span class="loading-spinner"></span> جاري المعالجة...';
+        statusEl.innerHTML = '📖 الخطوة 1/3: استخراج النصوص من ملف PDF...';
 
         try {
             const file = fileInput.files[0];
@@ -162,92 +199,178 @@
             const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
             let fullText = "";
 
+            // التحقق من صحة الصفحات
             if (endPage > pdf.numPages) endPage = pdf.numPages;
             if (startPage > endPage || startPage < 1) {
-                throw new Error(`نطاق الصفحات المدخل غير صحيح، الملف يحتوي على ${pdf.numPages} صفحة فقط.`);
+                throw new Error(`نطاق الصفحات غير صحيح. الملف يحتوي على ${pdf.numPages} صفحة فقط.`);
             }
 
+            // استخراج النصوص
             for (let i = startPage; i <= endPage; i++) {
+                statusEl.innerHTML = `📖 الخطوة 1/3: جاري قراءة الصفحة ${i} من ${endPage}...`;
                 const page = await pdf.getPage(i);
                 const textContent = await page.getTextContent();
-                fullText += textContent.items.map(item => item.str).join(" ") + " ";
+                const pageText = textContent.items.map(item => item.str).join(" ");
+                fullText += pageText + "\n";
             }
 
-            if (fullText.trim().length === 0) {
-                throw new Error("فشل المتصفح في العثور على نصوص قابلة للقراءة. تأكد أن الملف ليس عبارة عن صور صامتة.");
+            if (fullText.trim().length < 50) {
+                throw new Error("⚠️ النص المستخرج قصير جداً (أقل من 50 حرف). تأكد أن ملف PDF يحتوي على نصوص قابلة للقراءة وليس صوراً فقط.");
             }
 
-            statusEl.innerHTML = `الخطوة 2/2: جاري إرسال البيانات ومعالجتها عبر خوادم وموديل Gemini 2.5 Flash وتأليف الامتحان...`;
+            statusEl.innerHTML = `🤖 الخطوة 2/3: تم استخراج ${fullText.length} حرف. جاري توليد الأسئلة باستخدام الذكاء الاصطناعي...`;
             await generateQuizFromAI(fullText, qCount, apiKey);
 
         } catch (error) {
-            statusEl.innerHTML = `<div class="error-text"><strong>حدث خطأ أثناء المعالجة:</strong> ${error.message}</div>`;
+            showError(error.message);
             btn.disabled = false;
+            btn.innerHTML = '🚀 استخراج المحتوى وإنشاء الامتحان';
         }
     }
 
     async function generateQuizFromAI(extractedText, count, apiKey) {
         const prompt = `
-        أنت معلم خبير وموجه أصيل. استخرج من النص العلمي التالي بدقة متناهية ${count} أسئلة اختيار من متعدد هادفة وممتازة.
-        يجب أن يكون الرد الخاص بك عبارة عن مصفوفة JSON نقية ومتوافقة فقط وفقط، بدون استخدام علامات الماركداون (```json) وبدون نصوص ترحيبية قبل أو بعد المصفوفة البرمجية.
-        تنسيق الـ JSON المطلوب بدقة:
-        [{"id":1,"text":"نص السؤال هنا؟","options":["خيار أ","خيار ب","خيار ج","خيار د"],"correct":0,"explanation":"التفسير العلمي والدقيق لإجابة السؤال"}]
-        
-        ملاحظة: حقل "correct" يمثل رقم مؤشر الإجابة الصحيحة في المصفوفة (يبدأ من 0 للخيارات الأولى).
-        
-        النص المستخرج:
-        ${extractedText.substring(0, 18000)}`;
+        أنت أستاذ جامعي خبير في المناهج التعليمية. بناءً على النص العلمي التالي، قم بإنشاء ${count} سؤال اختيار من متعدد دقيق ومتنوع يغطي أهم النقاط في النص.
+
+        قواعد مهمة:
+        1. كل سؤال يجب أن يكون له 4 خيارات (واحد صحيح وثلاثة خاطئة).
+        2. الخيارات يجب أن تكون منطقية ومتنوعة.
+        3. درجة الصعوبة: متوسطة إلى متقدمة.
+        4. الإجابة الصحيحة يجب أن تكون مستخلصة مباشرة من النص.
+        5. التفسير (explanation) يجب أن يكون تعليمياً ويشرح لماذا هذه الإجابة صحيحة مع الاستشهاد من النص.
+
+        أرجو أن ترد فقط بمصفوفة JSON نقية بالصيغة التالية، بدون أي نصوص إضافية أو علامات ترقيم خارجية:
+        [
+            {
+                "text": "نص السؤال هنا؟",
+                "options": ["الخيار الأول", "الخيار الثاني", "الخيار الثالث", "الخيار الرابع"],
+                "correct": 0,
+                "explanation": "شرح مفصل للإجابة الصحيحة مع ذكر المصدر من النص"
+            }
+        ]
+
+        ملاحظة: حقل "correct" هو رقم الفهرس (يبدأ من 0) للخيار الصحيح في مصفوفة options.
+
+        النص العلمي:
+        ${extractedText.substring(0, 20000)}
+        `;
 
         try {
-            // استخدام الرابط المحدث والفعال لموديل gemini-2.5-flash
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+            // استخدام النموذج الصحيح والمتاح: gemini-1.5-flash
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                body: JSON.stringify({ 
+                    contents: [{ 
+                        parts: [{ text: prompt }] 
+                    }],
+                    generationConfig: {
+                        temperature: 0.3,
+                        topK: 1,
+                        topP: 0.8,
+                        maxOutputTokens: 4096
+                    }
+                })
             });
 
             const data = await response.json();
-            if(data.error) throw new Error(data.error.message);
+            
+            // التحقق من أخطاء API
+            if (data.error) {
+                console.error("API Error Details:", data.error);
+                if (data.error.code === 403 || data.error.message.includes('permission')) {
+                    throw new Error("مفتاح API غير صالح أو ليس لديه صلاحية. تأكد من تفعيل billing أو استخدام مفتاح صحيح.");
+                } else if (data.error.code === 400) {
+                    throw new Error("طلب غير صالح: " + data.error.message);
+                } else {
+                    throw new Error(data.error.message);
+                }
+            }
+
+            if (!data.candidates || !data.candidates[0] || !data.candidates[0].content) {
+                throw new Error("لم يستجب الخادم بالأسئلة المطلوبة. حاول مرة أخرى.");
+            }
 
             let rawText = data.candidates[0].content.parts[0].text;
-            const jsonMatch = rawText.match(/\[[\s\S]*\]/);
-            if (!jsonMatch) throw new Error("استجابة الخادم غير متوافقة مع التنسيق البرمجي المتوقع.");
+            console.log("الرد الخام من API:", rawText.substring(0, 200));
 
-            appState.questions = JSON.parse(jsonMatch[0]);
+            // استخراج JSON من الرد
+            let jsonMatch = rawText.match(/\[[\s\S]*\]/);
+            if (!jsonMatch) {
+                // محاولة بديلة: البحث عن أي شيء بين قوسين معقوفين
+                jsonMatch = rawText.match(/\{[\s\S]*\}/);
+                if (!jsonMatch) throw new Error("لم يتم العثور على أسئلة بصيغة JSON صحيحة في استجابة الخادم.");
+            }
+
+            let parsedQuestions = JSON.parse(jsonMatch[0]);
             
-            // التبديل لواجهة حل الطالب
+            // التأكد من أن الناتج مصفوفة
+            if (!Array.isArray(parsedQuestions)) {
+                parsedQuestions = [parsedQuestions];
+            }
+
+            // إضافة id فريد لكل سؤال
+            appState.questions = parsedQuestions.map((q, idx) => ({
+                id: idx + 1,
+                text: q.text || q.question || "سؤال غير محدد",
+                options: q.options || ["خيار 1", "خيار 2", "خيار 3", "خيار 4"],
+                correct: q.correct !== undefined ? q.correct : 0,
+                explanation: q.explanation || "لا يوجد تفسير متاح لهذا السؤال."
+            }));
+
+            // التحقق من عدد الأسئلة
+            if (appState.questions.length === 0) {
+                throw new Error("لم يتم توليد أي أسئلة. حاول مرة أخرى أو قلل عدد الأسئلة.");
+            }
+
+            // عرض واجهة الطالب
             document.getElementById('setup-section').style.display = 'none';
             document.getElementById('student-section').style.display = 'block';
             renderQuiz();
+            
+            document.getElementById('status-message').innerHTML = '<div class="success-text">✅ تم إنشاء الامتحان بنجاح! يمكن للطالب الآن البدء في الحل.</div>';
 
         } catch (error) {
-            document.getElementById('status-message').innerHTML = `<div class="error-text"><strong>تفاصيل خطأ الـ API:</strong> ${error.message}</div>`;
+            console.error("Full error:", error);
+            let errorMsg = error.message;
+            if (errorMsg.includes("fetch")) {
+                errorMsg = "فشل الاتصال بالخادم. تأكد من اتصالك بالإنترنت ومحاولة مرة أخرى.";
+            } else if (errorMsg.includes("API key")) {
+                errorMsg = "مفتاح API غير صالح. يرجى الحصول على مفتاح جديد من Google AI Studio.";
+            }
+            showError(errorMsg);
             document.getElementById('start-btn').disabled = false;
+            document.getElementById('start-btn').innerHTML = '🚀 استخراج المحتوى وإنشاء الامتحان';
         }
     }
 
     function renderQuiz() {
         const container = document.getElementById('quiz-container');
         container.innerHTML = '';
+        
+        if (!appState.questions || appState.questions.length === 0) {
+            container.innerHTML = '<div class="error-text">⚠️ لا توجد أسئلة متاحة. يرجى إعادة إنشاء الامتحان.</div>';
+            return;
+        }
 
         appState.questions.forEach((q, index) => {
             const qCard = document.createElement('div');
             qCard.className = 'question-card';
-            let optionsHTML = '';
             
+            let optionsHTML = '';
             q.options.forEach((opt, optIndex) => {
                 optionsHTML += `
                     <label class="option-item">
-                        <input type="radio" name="q${q.id}" value="${optIndex}" required>
-                        ${opt}
+                        <input type="radio" name="q${index}" value="${optIndex}" required>
+                        <span>${opt}</span>
                     </label>`;
             });
 
             qCard.innerHTML = `
-                <div style="font-weight: bold; margin-bottom: 12px; display:flex; justify-content:space-between; align-items: flex-start;">
-                    <span>سؤال ${index + 1}: ${q.text}</span>
-                    <span style="color:var(--secondary); background:#ccfbf1; padding:2px 8px; border-radius:4px; font-size:0.85rem; white-space:nowrap; margin-right:10px;">
-                        ${appState.markPerQuestion} درجات
+                <div style="font-weight: bold; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: flex-start;">
+                    <span>❓ السؤال ${index + 1}: ${q.text}</span>
+                    <span style="color: var(--secondary); background: #ccfbf1; padding: 4px 10px; border-radius: 20px; font-size: 0.85rem; white-space: nowrap; margin-right: 10px;">
+                        ${appState.markPerQuestion} درجة
                     </span>
                 </div>
                 <div>${optionsHTML}</div>`;
@@ -255,62 +378,117 @@
         });
     }
 
-    // تصحيح فوري وعرض تفصيلي
+    // تصحيح الامتحان وعرض النتائج
     document.getElementById('quiz-form').addEventListener('submit', function(e) {
         e.preventDefault();
-        
-        const studentName = document.getElementById('student-name').value.trim() || 'طالب زائر';
+
+        const studentName = document.getElementById('student-name').value.trim();
+        if (!studentName) {
+            alert("يرجى إدخال اسم الطالب ثلاثياً قبل تسليم الامتحان.");
+            return;
+        }
+
         let studentScore = 0;
         let reviewHTML = '';
 
         appState.questions.forEach((q, index) => {
-            const selectedInput = document.querySelector(`input[name="q${q.id}"]:checked`);
+            const selectedInput = document.querySelector(`input[name="q${index}"]:checked`);
             const selectedValue = selectedInput ? parseInt(selectedInput.value) : -1;
-            const isCorrect = selectedValue === q.correct;
+            const isCorrect = (selectedValue === q.correct);
             
-            if (isCorrect) studentScore += appState.markPerQuestion;
+            if (isCorrect) {
+                studentScore += appState.markPerQuestion;
+            }
 
+            // بناء التقرير التفصيلي
             reviewHTML += `
                 <div class="review-card ${isCorrect ? 'correct-ans' : 'wrong-ans'}">
                     <div class="status-badge ${isCorrect ? 'correct' : 'wrong'}">
-                        ${isCorrect ? 'إجابة صحيحة' : 'إجابة خاطئة'}
+                        ${isCorrect ? '✅ إجابة صحيحة' : '❌ إجابة خاطئة'}
                     </div>
-                    <p style="font-weight:600; margin-bottom:10px;"><strong>س ${index + 1}:</strong> ${q.text}</p>
-                    <div>
+                    <p style="font-weight: 700; margin-bottom: 12px; font-size: 1.05rem;">
+                        <strong>سؤال ${index + 1}:</strong> ${q.text}
+                    </p>
+                    <div style="margin-bottom: 12px;">
                         ${q.options.map((opt, optIdx) => {
                             let optClass = 'review-option';
-                            if (optIdx === q.correct) optClass += ' is-correct';
-                            if (optIdx === selectedValue && !isCorrect) optClass += ' selected-wrong';
-                            return `<div class="${optClass}">${opt}</div>`;
+                            let badge = '';
+                            if (optIdx === q.correct) {
+                                optClass += ' is-correct';
+                                badge = ' ✓ (الإجابة النموذجية)';
+                            }
+                            if (optIdx === selectedValue && !isCorrect) {
+                                optClass += ' selected-wrong';
+                                badge = ' ✗ (إجابتك)';
+                            } else if (optIdx === selectedValue && isCorrect) {
+                                badge = ' ✓ (إجابتك الصحيحة)';
+                            }
+                            return `<div class="${optClass}">${opt}${badge}</div>`;
                         }).join('')}
                     </div>
-                    <p style="font-size: 0.9rem; color: var(--text-secondary); background: #f1f5f9; padding: 8px; border-radius: 6px; margin-top: 10px; border-right:3px solid var(--accent);">
-                        <strong>التفسير والشرح:</strong> ${q.explanation}
-                    </p>
+                    <div style="background: #f0f9ff; padding: 12px; border-radius: 8px; border-right: 4px solid var(--accent);">
+                        <strong>📖 الشرح والتعلم:</strong><br>
+                        ${q.explanation}
+                    </div>
                 </div>`;
         });
 
+        // إخفاء قسم الطالب وعرض النتائج
         document.getElementById('student-section').style.display = 'none';
         document.getElementById('result-section').style.display = 'block';
-        
+
+        const percentage = ((studentScore / appState.totalMarks) * 100).toFixed(2);
+        let gradeMessage = '';
+        if (percentage >= 90) gradeMessage = '🏆 ممتاز! أداء متميز';
+        else if (percentage >= 75) gradeMessage = '🎉 جيد جداً! نتمنى لك المزيد من التفوق';
+        else if (percentage >= 60) gradeMessage = '📚 جيد، يمكنك التحسن بالمذاكرة';
+        else gradeMessage = '💪 تحتاج للمزيد من المراجعة والتدريب';
+
         document.getElementById('result-display').innerHTML = `
-            <h2>تم تسليم ورقة الإجابة بنجاح</h2>
-            <p style="margin-top:5px; font-weight:600; color:var(--text-secondary);">اسم الطالب: ${studentName}</p>
+            <h2>🎯 تم تسليم الامتحان بنجاح</h2>
+            <p style="margin-top: 10px; font-size: 1.1rem;"><strong>👨‍🎓 الطالب:</strong> ${studentName}</p>
             <div class="result-score">${studentScore} / ${appState.totalMarks}</div>
-            <p>نسبة النجاح والأداء رُصدت تلقائياً.</p>
+            <p style="font-size: 1.2rem; font-weight: 600; color: var(--primary);">${gradeMessage}</p>
+            <p style="margin-top: 10px;">📊 نسبة النجاح: ${percentage}%</p>
         `;
         document.getElementById('review-container').innerHTML = reviewHTML;
 
-        // إرسال النتيجة للإدارة
-        sendResultsToAdmin(studentName, studentScore, appState.totalMarks);
+        // إرسال النتيجة للإدارة (يمكن ربطها بقاعدة بيانات لاحقاً)
+        sendResultsToAdmin(studentName, studentScore, appState.totalMarks, percentage);
     });
 
-    // دالة إرسال ورصد النتيجة في الإدارة (جاهزة للربط بـ Firebase لاحقاً)
-    function sendResultsToAdmin(name, score, total) {
-        console.log(`تم رصد نتيجة الطالب برمجياً في الإدارة -> الاسم: ${name} | الدرجة: ${score}/${total}`);
-        // للربط بـ Firebase مستقبلاً:
-        // db.collection("results").add({ name: name, score: score, total: total, date: new Date() });
+    function sendResultsToAdmin(name, score, total, percentage) {
+        const resultData = {
+            studentName: name,
+            score: score,
+            totalMarks: total,
+            percentage: percentage,
+            timestamp: new Date().toISOString(),
+            questionsCount: appState.questions.length
+        };
+        console.log("📊 تم رصد النتيجة بنجاح:", resultData);
+        
+        // يمكن إضافة كود لتخزين النتائج في Firebase أو LocalStorage هنا
+        let allResults = JSON.parse(localStorage.getItem('examResults') || '[]');
+        allResults.push(resultData);
+        localStorage.setItem('examResults', JSON.stringify(allResults));
+        
+        // عرض رسالة في وحدة التحكم للمعلم
+        console.log(`✅ تم حفظ نتيجة ${name} في سجل الإدارة محلياً.`);
     }
+
+    function showError(message) {
+        const statusEl = document.getElementById('status-message');
+        statusEl.innerHTML = `<div class="error-text">⚠️ ${message}</div>`;
+        setTimeout(() => {
+            if (statusEl.innerHTML.includes('error-text')) {
+                statusEl.innerHTML = '';
+            }
+        }, 8000);
+    }
+
+    // إضافة مثال توضيحي عند تحميل الصفحة
+    console.log("✅ المنصة الذكية جاهزة للاستخدام - النظام متكامل مع Gemini 1.5 Flash");
 </script>
 </body>
 </html>
