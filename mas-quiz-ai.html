@@ -71,6 +71,8 @@
 
         .loading-spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,.3); border-radius: 50%; border-top-color: white; animation: spin 1s ease-in-out infinite; margin-right: 10px; }
         @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .notice { background: #fef3c7; padding: 12px; border-radius: 8px; margin-bottom: 15px; border-right: 4px solid var(--accent); font-size: 0.85rem; }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
     <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';</script>
@@ -85,10 +87,14 @@
 
     <div class="card" id="setup-section">
         <h3>📚 لوحة تحكم المعلم</h3>
+        
+        <div class="notice">
+            ⚠️ ملاحظة: النماذج المتاحة حالياً هي <strong>gemini-1.5-flash-001</strong> و <strong>gemini-1.5-pro-001</strong>
+        </div>
 
         <div class="form-group">
             <label>🔑 مفتاح Gemini API:</label>
-            <input type="password" id="api-key" placeholder="أدخل المفتاح (AIza... أو AQ.Ab8...)" value="AQ.Ab8RN6KmnHN1JE2cZWGMtkNE...">
+            <input type="password" id="api-key" placeholder="أدخل المفتاح (يبدأ بـ AIza أو AQ.Ab8...)" value="AQ.Ab8RN6KmnHN1JE2cZWGMtkNE...">
             <small style="color: var(--text-secondary); display: block; margin-top: 5px;">✅ مفتاحك صالح ويعمل مجاناً</small>
         </div>
 
@@ -207,62 +213,71 @@
         ${extractedText.substring(0, 15000)}
         `;
 
-        try {
-            // استخدام النموذج الصحيح الذي يعمل حالياً
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    contents: [{ parts: [{ text: prompt }] }],
-                    generationConfig: { temperature: 0.3, maxOutputTokens: 4096 }
-                })
-            });
-
-            const data = await response.json();
-            
-            if (data.error) {
-                console.error("API Error:", data.error);
+        // قائمة النماذج المتاحة فعلياً (بالصيغة الصحيحة)
+        const modelsToTry = [
+            "gemini-1.5-flash-001",
+            "gemini-1.5-pro-001", 
+            "gemini-1.0-pro-001",
+            "gemini-1.0-pro"
+        ];
+        
+        let lastError = null;
+        
+        for (const model of modelsToTry) {
+            try {
+                console.log(`محاولة استخدام النموذج: ${model}`);
                 
-                // محاولة استخدام نموذج بديل
-                const fallbackResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${apiKey}`, {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                    body: JSON.stringify({ 
+                        contents: [{ parts: [{ text: prompt }] }],
+                        generationConfig: { temperature: 0.3, maxOutputTokens: 4096 }
+                    })
                 });
-                const fallbackData = await fallbackResponse.json();
-                if (fallbackData.error) throw new Error(fallbackData.error.message);
-                data.candidates = fallbackData.candidates;
+
+                const data = await response.json();
+                
+                if (data.error) {
+                    console.log(`النموذج ${model} فشل:`, data.error.message);
+                    lastError = data.error;
+                    continue;
+                }
+
+                if (data.candidates && data.candidates[0]) {
+                    let rawText = data.candidates[0].content.parts[0].text;
+                    let jsonMatch = rawText.match(/\[[\s\S]*\]/);
+                    if (!jsonMatch) jsonMatch = rawText.match(/\{[\s\S]*\}/);
+                    if (!jsonMatch) continue;
+
+                    let parsedQuestions = JSON.parse(jsonMatch[0]);
+                    if (!Array.isArray(parsedQuestions)) parsedQuestions = [parsedQuestions];
+
+                    appState.questions = parsedQuestions.map((q, idx) => ({
+                        id: idx + 1,
+                        text: q.text || q.question || "سؤال",
+                        options: q.options || ["خيار 1", "خيار 2", "خيار 3", "خيار 4"],
+                        correct: q.correct !== undefined ? q.correct : 0,
+                        explanation: q.explanation || "لا يوجد تفسير."
+                    }));
+
+                    if (appState.questions.length > 0) {
+                        // نجحنا!
+                        document.getElementById('setup-section').style.display = 'none';
+                        document.getElementById('student-section').style.display = 'block';
+                        renderQuiz();
+                        document.getElementById('status-message').innerHTML = '<div class="success-text">✅ تم إنشاء الامتحان بنجاح باستخدام نموذج ' + model + '!</div>';
+                        return;
+                    }
+                }
+            } catch (e) {
+                console.log(`خطأ في النموذج ${model}:`, e.message);
+                lastError = e;
             }
-
-            if (!data.candidates || !data.candidates[0]) {
-                throw new Error("لم يتم استلام أسئلة.");
-            }
-
-            let rawText = data.candidates[0].content.parts[0].text;
-            let jsonMatch = rawText.match(/\[[\s\S]*\]/);
-            if (!jsonMatch) throw new Error("لم يتم العثور على JSON.");
-
-            let parsedQuestions = JSON.parse(jsonMatch[0]);
-            if (!Array.isArray(parsedQuestions)) parsedQuestions = [parsedQuestions];
-
-            appState.questions = parsedQuestions.map((q, idx) => ({
-                id: idx + 1,
-                text: q.text || q.question || "سؤال",
-                options: q.options || ["خيار 1", "خيار 2", "خيار 3", "خيار 4"],
-                correct: q.correct !== undefined ? q.correct : 0,
-                explanation: q.explanation || "لا يوجد تفسير."
-            }));
-
-            if (appState.questions.length === 0) throw new Error("لم يتم توليد أسئلة.");
-
-            document.getElementById('setup-section').style.display = 'none';
-            document.getElementById('student-section').style.display = 'block';
-            renderQuiz();
-            document.getElementById('status-message').innerHTML = '<div class="success-text">✅ تم إنشاء الامتحان بنجاح!</div>';
-
-        } catch (error) {
-            throw new Error(`فشل التوليد: ${error.message}`);
         }
+        
+        // إذا وصلنا هنا، كل النماذج فشلت
+        throw new Error(lastError?.message || "جميع النماذج غير متاحة. تأكد من صحة مفتاح API واتصال الإنترنت.");
     }
 
     function renderQuiz() {
@@ -346,6 +361,8 @@
         const statusEl = document.getElementById('status-message');
         statusEl.innerHTML = `<div class="error-text">⚠️ ${message}</div>`;
         setTimeout(() => { if (statusEl.innerHTML.includes('error-text')) statusEl.innerHTML = ''; }, 8000);
+        document.getElementById('start-btn').disabled = false;
+        document.getElementById('start-btn').innerHTML = '🚀 استخراج المحتوى وإنشاء الامتحان';
     }
 </script>
 </body>
