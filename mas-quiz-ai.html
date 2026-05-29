@@ -3,76 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>المنصة الذكية لتوليد وتصحيح الامتحانات</title>
+    <title>منصة المنظومة التعليمية الذكية</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { 
-            --primary: #1e3a8a; 
-            --primary-light: #3b82f6; 
-            --secondary: #0d9488; 
-            --bg: #f8fafc; 
-            --surface: #ffffff; 
-            --text: #0f172a; 
-            --text-secondary: #64748b; 
-            --border: #e2e8f0; 
-            --success: #16a34a; 
-            --error: #dc2626; 
-            --accent: #f59e0b;
-            --radius: 12px; 
+        :root {
+            --primary: #1e3a8a;
+            --primary-light: #3b82f6;
+            --secondary: #0d9488;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text: #0f172a;
+            --border: #e2e8f0;
+            --danger: #ef4444;
+            --radius: 12px;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
-        body { background-color: var(--bg); color: var(--text); padding: 20px; line-height: 1.6; }
-        .container { max-width: 800px; margin: 0 auto; }
-        header { text-align: center; margin-bottom: 30px; }
-        header h1 { color: var(--primary); font-weight: 700; margin-bottom: 5px; }
-        header p { color: var(--text-secondary); font-size: 0.95rem; }
+        body { background-color: var(--bg); color: var(--text); padding: 15px; line-height: 1.6; }
+        .container { max-width: 800px; margin: 0 auto; width: 100%; }
+        
+        header { text-align: center; margin-bottom: 25px; }
+        header h1 { color: var(--primary); font-size: 1.5rem; margin-bottom: 5px; }
 
-        .card { background: var(--surface); padding: 25px; border-radius: var(--radius); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); margin-bottom: 20px; border: 1px solid var(--border); }
-        .card h3 { color: var(--primary); margin-bottom: 15px; padding-bottom: 8px; border-bottom: 2px solid var(--border); }
+        .card { background: var(--surface); padding: 20px; border-radius: var(--radius); box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid var(--border); }
+        .card h3 { color: var(--primary); margin-bottom: 15px; padding-bottom: 8px; border-bottom: 2px solid var(--border); font-size: 1.2rem; }
 
         .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--primary); font-size: 0.95rem; }
-        input[type="file"], input[type="number"], input[type="password"], input[type="text"] { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-family: 'Cairo', sans-serif; background-color: #f8fafc; }
-        input:focus { outline: none; border-color: var(--primary-light); background-color: #fff; }
-
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
-        @media (max-width: 480px) { .grid-2 { grid-template-columns: 1fr; } }
-
-        .btn { display: block; width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 20px; transition: 0.3s; text-align: center; }
-        .btn:hover { background: #152e72; }
-        .btn-success { background: var(--secondary); }
-        .btn-success:hover { background: #0b7a70; }
-        .btn:disabled { background: #94a3b8; cursor: not-allowed; }
-
-        #status-message { font-weight: bold; color: var(--secondary); text-align: center; margin-top: 15px; }
-        .error-text { color: var(--error); background: #fee2e2; padding: 12px; border-radius: 8px; font-size: 0.9rem; margin-top: 10px; text-align: right; border-right: 4px solid var(--error); }
-        .success-text { color: var(--success); background: #dcfce7; padding: 12px; border-radius: 8px; font-size: 0.9rem; margin-top: 10px; text-align: right; border-right: 4px solid var(--success); }
-
-        .question-card { background: var(--bg); border-radius: 8px; padding: 18px; margin-top: 20px; border-right: 4px solid var(--primary-light); }
-        .option-item { display: block; padding: 12px; margin-bottom: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; transition: 0.2s; }
-        .option-item:hover { border-color: var(--primary-light); background: #eff6ff; }
-        .option-item input { margin-left: 10px; accent-color: var(--primary); }
-
-        .result-box { text-align: center; padding: 30px; background: #e0f2fe; border-radius: var(--radius); margin-top: 20px; border: 2px solid var(--primary-light); }
-        .result-score { font-size: 3rem; font-weight: bold; color: var(--primary); margin: 10px 0; }
-
-        .review-card { border-radius: 8px; padding: 18px; margin-top: 15px; border: 1px solid var(--border); background: var(--surface); }
-        .review-card.correct-ans { border-right: 5px solid var(--success); }
-        .review-card.wrong-ans { border-right: 5px solid var(--error); }
-
-        .status-badge { display: inline-block; padding: 4px 10px; font-size: 0.8rem; font-weight: 700; border-radius: 4px; margin-bottom: 10px; }
-        .status-badge.correct { background-color: rgba(22, 163, 74, 0.1); color: var(--success); }
-        .status-badge.wrong { background-color: rgba(220, 38, 38, 0.1); color: var(--error); }
-
-        .review-option { padding: 10px; margin-bottom: 6px; border-radius: 6px; border: 1px solid var(--border); font-size: 0.95rem; }
-        .review-option.is-correct { background-color: rgba(22, 163, 74, 0.1); border-color: var(--success); color: var(--success); font-weight: 600; }
-        .review-option.selected-wrong { background-color: rgba(220, 38, 38, 0.1); border-color: var(--error); color: var(--error); font-weight: 600; }
-
-        .loading-spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,.3); border-radius: 50%; border-top-color: white; animation: spin 1s ease-in-out infinite; margin-right: 10px; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.9rem; }
+        input[type="text"], input[type="password"], input[type="number"], select, textarea {
+            width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-family: inherit;
+        }
+        textarea { resize: vertical; min-height: 120px; }
         
-        .notice { background: #fef3c7; padding: 12px; border-radius: 8px; margin-bottom: 15px; border-right: 4px solid var(--accent); font-size: 0.85rem; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        
+        .btn { display: inline-block; width: 100%; padding: 12px; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: 0.3s; text-align: center; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-success { background: var(--secondary); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+        
+        .btn-group { display: flex; gap: 10px; margin-top: 10px; }
+        .btn-group .btn { flex: 1; }
+
+        #status-msg { margin-top: 10px; text-align: center; font-weight: bold; font-size: 0.9rem; }
+
+        /* Mobile Adjustments */
+        @media (max-width: 600px) {
+            .grid-2 { grid-template-columns: 1fr; }
+            .btn-group { flex-direction: column; }
+        }
+
+        .question-card { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 15px; margin-top: 15px; }
+        .option-label { display: block; padding: 10px; margin-top: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; }
+        .option-label:hover { border-color: var(--primary-light); }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
     <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';</script>
@@ -81,91 +65,105 @@
 
 <div class="container">
     <header>
-        <h1>🎓 المنصة التعليمية الذكية</h1>
-        <p>توليد وتصحيح الامتحانات تلقائياً من الكتب والمذكرات</p>
+        <h1>🎓 منصة إعداد الامتحانات الذكية</h1>
+        <p>معلم أول رياضيات - نظام استخراج وتوليد الأسئلة</p>
     </header>
 
-    <div class="card" id="setup-section">
-        <h3>📚 لوحة تحكم المعلم</h3>
-        
-        <div class="notice">
-            ⚠️ ملاحظة: النماذج المتاحة حالياً هي <strong>gemini-1.5-flash-001</strong> و <strong>gemini-1.5-pro-001</strong>
-        </div>
-
+    <div class="card">
+        <h3>⚙️ إعدادات النظام والـ API</h3>
         <div class="form-group">
             <label>🔑 مفتاح Gemini API:</label>
-            <input type="password" id="api-key" placeholder="أدخل المفتاح (يبدأ بـ AIza أو AQ.Ab8...)" value="AQ.Ab8RN6KmnHN1JE2cZWGMtkNE...">
-            <small style="color: var(--text-secondary); display: block; margin-top: 5px;">✅ مفتاحك صالح ويعمل مجاناً</small>
-        </div>
-
-        <div class="form-group">
-            <label>📄 ملف PDF:</label>
-            <input type="file" id="file-upload" accept="application/pdf">
-        </div>
-
-        <div class="grid-2">
-            <div class="form-group"><label>📖 من صفحة:</label><input type="number" id="start-page" value="1" min="1"></div>
-            <div class="form-group"><label>📖 إلى صفحة:</label><input type="number" id="end-page" value="5" min="1"></div>
-        </div>
-        <div class="grid-2">
-            <div class="form-group"><label>❓ عدد الأسئلة:</label><input type="number" id="q-count" value="5" min="1" max="20"></div>
-            <div class="form-group"><label>⭐ درجة كل سؤال:</label><input type="number" id="q-mark" value="2" min="1"></div>
-        </div>
-
-        <button class="btn" id="start-btn">🚀 استخراج المحتوى وإنشاء الامتحان</button>
-        <div id="status-message"></div>
-    </div>
-
-    <div id="student-section" style="display: none;">
-        <div class="card">
-            <h3>✍️ واجهة الطالب</h3>
-            <div class="form-group">
-                <label>👤 اسم الطالب:</label>
-                <input type="text" id="student-name" placeholder="الاسم الثلاثي">
+            <input type="password" id="api-key" placeholder="أدخل مفتاحك هنا...">
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="saveKey()">💾 حفظ بالمحلي</button>
+                <button class="btn btn-danger" onclick="deleteKey()">🗑️ مسح من الكاش</button>
             </div>
-            <form id="quiz-form">
-                <div id="quiz-container"></div>
-                <button type="submit" class="btn btn-success">📤 تسليم الامتحان</button>
-            </form>
+        </div>
+        <div class="form-group">
+            <label>🧠 اختر نموذج الذكاء الاصطناعي:</label>
+            <select id="model-select">
+                <option value="gemini-1.5-flash">Gemini 1.5 Flash (سريع وممتاز للامتحانات)</option>
+                <option value="gemini-1.5-pro">Gemini 1.5 Pro (عالي الدقة والتحليل)</option>
+                <option value="gemini-1.0-pro">Gemini 1.0 Pro (الإصدار المستقر القديم)</option>
+            </select>
         </div>
     </div>
 
-    <div id="result-section" style="display: none;">
-        <div class="result-box" id="result-display"></div>
-        <h3 style="margin-top: 30px; margin-bottom: 10px; color: var(--primary);">📋 التقرير التفصيلي:</h3>
-        <div id="review-container"></div>
-        <button class="btn" onclick="window.location.reload()">🔄 امتحان جديد</button>
+    <div class="card" id="extraction-section">
+        <h3>📄 استخراج المحتوى من الملفات</h3>
+        <div class="form-group">
+            <label>اختر ملف PDF:</label>
+            <input type="file" id="file-upload" accept="application/pdf" class="btn-outline" style="padding: 5px;">
+        </div>
+        <div class="grid-2">
+            <div class="form-group"><label>من صفحة:</label><input type="number" id="start-page" value="1" min="1"></div>
+            <div class="form-group"><label>إلى صفحة:</label><input type="number" id="end-page" value="2" min="1"></div>
+        </div>
+        <button class="btn btn-outline" onclick="extractText()">📥 استخراج النص فقط</button>
+        <div id="extract-status" id="status-msg"></div>
     </div>
+
+    <div class="card">
+        <h3>✍️ النص المستخرج (يمكنك التعديل عليه)</h3>
+        <div class="form-group">
+            <textarea id="extracted-text" placeholder="سيظهر النص المستخرج هنا، ويمكنك كتابة نصك الخاص مباشرة..."></textarea>
+        </div>
+        
+        <div class="grid-2">
+            <div class="form-group"><label>عدد الأسئلة المطلوبة:</label><input type="number" id="q-count" value="5" min="1"></div>
+            <div class="form-group"><label>درجة السؤال:</label><input type="number" id="q-mark" value="2" min="1"></div>
+        </div>
+        <button class="btn btn-success" onclick="generateExam()" id="generate-btn">🚀 توليد الامتحان الآن</button>
+        <div id="gen-status" style="margin-top: 10px; text-align: center; font-weight: bold; color: var(--primary);"></div>
+    </div>
+
+    <div id="exam-preview" style="display: none;" class="card">
+        <h3>📋 معاينة الامتحان</h3>
+        <div id="quiz-container"></div>
+        <button class="btn btn-primary" style="margin-top: 20px;" onclick="window.print()">🖨️ طباعة الامتحان</button>
+    </div>
+
 </div>
 
 <script>
-    let appState = {
-        questions: [],
-        markPerQuestion: 2,
-        totalMarks: 0
+    // عند تحميل الصفحة، جلب المفتاح المحفوظ إن وجد
+    window.onload = function() {
+        const savedKey = localStorage.getItem('gemini_api_key');
+        if (savedKey) {
+            document.getElementById('api-key').value = savedKey;
+        }
     };
 
-    document.getElementById('start-btn').addEventListener('click', startProcess);
+    function saveKey() {
+        const key = document.getElementById('api-key').value.trim();
+        if(key) {
+            localStorage.setItem('gemini_api_key', key);
+            alert("✅ تم حفظ المفتاح بنجاح في متصفحك!");
+        } else {
+            alert("⚠️ يرجى إدخال مفتاح أولاً.");
+        }
+    }
 
-    async function startProcess() {
-        const apiKey = document.getElementById('api-key').value.trim();
+    function deleteKey() {
+        localStorage.removeItem('gemini_api_key');
+        document.getElementById('api-key').value = '';
+        alert("🗑️ تم مسح المفتاح من الذاكرة المحلية.");
+    }
+
+    // دالة استخراج النص من الـ PDF
+    async function extractText() {
         const fileInput = document.getElementById('file-upload');
-        const statusEl = document.getElementById('status-message');
-        const btn = document.getElementById('start-btn');
-
+        const statusEl = document.getElementById('extract-status');
         const startPage = parseInt(document.getElementById('start-page').value) || 1;
-        let endPage = parseInt(document.getElementById('end-page').value) || 5;
-        const qCount = parseInt(document.getElementById('q-count').value) || 5;
-        appState.markPerQuestion = parseInt(document.getElementById('q-mark').value) || 2;
-        appState.totalMarks = qCount * appState.markPerQuestion;
+        let endPage = parseInt(document.getElementById('end-page').value) || 1;
 
-        if (!apiKey) { showError("أدخل مفتاح API"); return; }
-        if (!fileInput.files.length) { showError("اختر ملف PDF"); return; }
+        if (!fileInput.files.length) {
+            statusEl.innerHTML = '<span style="color:red;">⚠️ الرجاء اختيار ملف PDF أولاً</span>';
+            return;
+        }
 
-        btn.disabled = true;
-        btn.innerHTML = '<span class="loading-spinner"></span> جاري المعالجة...';
-        statusEl.innerHTML = '📖 استخراج النصوص من PDF...';
-
+        statusEl.innerHTML = '⏳ جاري القراءة والاستخراج...';
+        
         try {
             const file = fileInput.files[0];
             const arrayBuffer = await file.arrayBuffer();
@@ -175,194 +173,105 @@
             if (endPage > pdf.numPages) endPage = pdf.numPages;
 
             for (let i = startPage; i <= endPage; i++) {
-                statusEl.innerHTML = `📖 قراءة الصفحة ${i} من ${endPage}...`;
                 const page = await pdf.getPage(i);
                 const textContent = await page.getTextContent();
                 fullText += textContent.items.map(item => item.str).join(" ") + "\n";
             }
 
-            if (fullText.trim().length < 50) {
-                throw new Error("النص المستخرج قصير جداً. تأكد أن PDF يحتوي على نصوص قابلة للقراءة.");
-            }
-
-            statusEl.innerHTML = `🤖 توليد ${qCount} سؤال باستخدام الذكاء الاصطناعي...`;
-            await generateQuizFromAI(fullText, qCount, apiKey);
-
+            document.getElementById('extracted-text').value = fullText.trim();
+            statusEl.innerHTML = '<span style="color:green;">✅ تم استخراج النص بنجاح! راجعه في المربع بالأسفل.</span>';
         } catch (error) {
-            showError(error.message);
-            btn.disabled = false;
-            btn.innerHTML = '🚀 استخراج المحتوى وإنشاء الامتحان';
+            statusEl.innerHTML = `<span style="color:red;">❌ خطأ في القراءة: ${error.message}</span>`;
         }
     }
 
-    async function generateQuizFromAI(extractedText, count, apiKey) {
-        const prompt = `
-        أنت أستاذ خبير. بناءً على النص التالي، أنشئ ${count} سؤال اختيار من متعدد.
+    // دالة التخاطب مع API وتوليد الامتحان
+    async function generateExam() {
+        const apiKey = document.getElementById('api-key').value.trim();
+        const model = document.getElementById('model-select').value;
+        const textToProcess = document.getElementById('extracted-text').value.trim();
+        const qCount = parseInt(document.getElementById('q-count').value) || 5;
+        const btn = document.getElementById('generate-btn');
+        const statusEl = document.getElementById('gen-status');
 
-        أجب فقط بمصفوفة JSON بهذا التنسيق الدقيق، بدون أي كلمات إضافية:
+        if (!apiKey) { alert("⚠️ الرجاء إدخال مفتاح API."); return; }
+        if (textToProcess.length < 20) { alert("⚠️ النص المستخرج قصير جداً أو فارغ."); return; }
+
+        btn.disabled = true;
+        btn.innerHTML = '⏳ جاري التوليد (قد يستغرق بضع ثوان)...';
+        statusEl.innerHTML = '';
+
+        const prompt = `
+        أنت أستاذ خبير. بناءً على النص المرفق، أنشئ ${qCount} سؤال اختيار من متعدد.
+        مهم جداً: أعد الإجابة فقط بصيغة مصفوفة JSON دقيقة بدون أي نصوص إضافية أو علامات Markdown مثل \`\`\`json.
+        الصيغة المطلوبة:
         [
             {
-                "text": "نص السؤال؟",
-                "options": ["خيار1", "خيار2", "خيار3", "خيار4"],
-                "correct": 0,
-                "explanation": "شرح الإجابة الصحيحة"
+                "question": "نص السؤال؟",
+                "options": ["خيار 1", "خيار 2", "خيار 3", "خيار 4"]
             }
         ]
 
         النص:
-        ${extractedText.substring(0, 15000)}
+        ${textToProcess.substring(0, 15000)}
         `;
 
-        // قائمة النماذج المتاحة فعلياً (بالصيغة الصحيحة)
-        const modelsToTry = [
-            "gemini-1.5-flash-001",
-            "gemini-1.5-pro-001", 
-            "gemini-1.0-pro-001",
-            "gemini-1.0-pro"
-        ];
-        
-        let lastError = null;
-        
-        for (const model of modelsToTry) {
-            try {
-                console.log(`محاولة استخدام النموذج: ${model}`);
-                
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        contents: [{ parts: [{ text: prompt }] }],
-                        generationConfig: { temperature: 0.3, maxOutputTokens: 4096 }
-                    })
-                });
-
-                const data = await response.json();
-                
-                if (data.error) {
-                    console.log(`النموذج ${model} فشل:`, data.error.message);
-                    lastError = data.error;
-                    continue;
-                }
-
-                if (data.candidates && data.candidates[0]) {
-                    let rawText = data.candidates[0].content.parts[0].text;
-                    let jsonMatch = rawText.match(/\[[\s\S]*\]/);
-                    if (!jsonMatch) jsonMatch = rawText.match(/\{[\s\S]*\}/);
-                    if (!jsonMatch) continue;
-
-                    let parsedQuestions = JSON.parse(jsonMatch[0]);
-                    if (!Array.isArray(parsedQuestions)) parsedQuestions = [parsedQuestions];
-
-                    appState.questions = parsedQuestions.map((q, idx) => ({
-                        id: idx + 1,
-                        text: q.text || q.question || "سؤال",
-                        options: q.options || ["خيار 1", "خيار 2", "خيار 3", "خيار 4"],
-                        correct: q.correct !== undefined ? q.correct : 0,
-                        explanation: q.explanation || "لا يوجد تفسير."
-                    }));
-
-                    if (appState.questions.length > 0) {
-                        // نجحنا!
-                        document.getElementById('setup-section').style.display = 'none';
-                        document.getElementById('student-section').style.display = 'block';
-                        renderQuiz();
-                        document.getElementById('status-message').innerHTML = '<div class="success-text">✅ تم إنشاء الامتحان بنجاح باستخدام نموذج ' + model + '!</div>';
-                        return;
-                    }
-                }
-            } catch (e) {
-                console.log(`خطأ في النموذج ${model}:`, e.message);
-                lastError = e;
-            }
-        }
-        
-        // إذا وصلنا هنا، كل النماذج فشلت
-        throw new Error(lastError?.message || "جميع النماذج غير متاحة. تأكد من صحة مفتاح API واتصال الإنترنت.");
-    }
-
-    function renderQuiz() {
-        const container = document.getElementById('quiz-container');
-        container.innerHTML = '';
-
-        appState.questions.forEach((q, index) => {
-            const qCard = document.createElement('div');
-            qCard.className = 'question-card';
-            let optionsHTML = '';
-            
-            q.options.forEach((opt, optIndex) => {
-                optionsHTML += `
-                    <label class="option-item">
-                        <input type="radio" name="q${index}" value="${optIndex}" required>
-                        <span>${opt}</span>
-                    </label>`;
+        try {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    contents: [{ parts: [{ text: prompt }] }],
+                    generationConfig: { temperature: 0.3 }
+                })
             });
 
-            qCard.innerHTML = `
-                <div style="font-weight: bold; margin-bottom: 15px; display: flex; justify-content: space-between;">
-                    <span>❓ ${index + 1}: ${q.text}</span>
-                    <span style="background:#ccfbf1; padding:4px 10px; border-radius:20px;">${appState.markPerQuestion} درجة</span>
-                </div>
-                <div>${optionsHTML}</div>`;
-            container.appendChild(qCard);
-        });
+            const data = await response.json();
+
+            if (data.error) throw new Error(data.error.message);
+
+            if (data.candidates && data.candidates[0]) {
+                let rawText = data.candidates[0].content.parts[0].text;
+                // تنظيف النص لاصطياد الـ JSON فقط
+                let jsonMatch = rawText.match(/\[[\s\S]*\]/);
+                if (!jsonMatch) throw new Error("لم يقم النموذج بإرجاع البيانات بصيغة JSON صحيحة.");
+
+                let questions = JSON.parse(jsonMatch[0]);
+                renderPreview(questions);
+                
+                document.getElementById('exam-preview').style.display = 'block';
+                statusEl.innerHTML = '✅ تم التوليد بنجاح!';
+            }
+        } catch (error) {
+            statusEl.innerHTML = `<span style="color:red;">❌ حدث خطأ: ${error.message}</span>`;
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '🚀 توليد الامتحان الآن';
+        }
     }
 
-    document.getElementById('quiz-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const studentName = document.getElementById('student-name').value.trim();
-        if (!studentName) { alert("يرجى إدخال اسم الطالب."); return; }
+    // عرض الأسئلة في واجهة المعاينة
+    function renderPreview(questions) {
+        const container = document.getElementById('quiz-container');
+        const qMark = document.getElementById('q-mark').value;
+        container.innerHTML = '';
 
-        let studentScore = 0;
-        let reviewHTML = '';
+        questions.forEach((q, index) => {
+            let optionsHTML = '';
+            q.options.forEach(opt => {
+                optionsHTML += `<label class="option-label"><input type="radio" disabled> ${opt}</label>`;
+            });
 
-        appState.questions.forEach((q, index) => {
-            const selectedInput = document.querySelector(`input[name="q${index}"]:checked`);
-            const selectedValue = selectedInput ? parseInt(selectedInput.value) : -1;
-            const isCorrect = (selectedValue === q.correct);
-            
-            if (isCorrect) studentScore += appState.markPerQuestion;
-
-            reviewHTML += `
-                <div class="review-card ${isCorrect ? 'correct-ans' : 'wrong-ans'}">
-                    <div class="status-badge ${isCorrect ? 'correct' : 'wrong'}">
-                        ${isCorrect ? '✅ صحيح' : '❌ خطأ'}
+            container.innerHTML += `
+                <div class="question-card">
+                    <div style="font-weight: bold; margin-bottom: 10px;">
+                        س${index + 1}: ${q.question} 
+                        <span style="float:left; font-size:0.8rem; background:#e2e8f0; padding:2px 8px; border-radius:4px;">(${qMark} درجات)</span>
                     </div>
-                    <p><strong>سؤال ${index + 1}:</strong> ${q.text}</p>
-                    <div>
-                        ${q.options.map((opt, optIdx) => {
-                            let cls = 'review-option';
-                            if (optIdx === q.correct) cls += ' is-correct';
-                            if (optIdx === selectedValue && !isCorrect) cls += ' selected-wrong';
-                            return `<div class="${cls}">${opt}</div>`;
-                        }).join('')}
-                    </div>
-                    <div style="background:#f0f9ff; padding:10px; border-radius:8px; margin-top:10px;">
-                        <strong>📖 الشرح:</strong> ${q.explanation}
-                    </div>
-                </div>`;
+                    <div>${optionsHTML}</div>
+                </div>
+            `;
         });
-
-        document.getElementById('student-section').style.display = 'none';
-        document.getElementById('result-section').style.display = 'block';
-
-        const percentage = ((studentScore / appState.totalMarks) * 100).toFixed(2);
-        
-        document.getElementById('result-display').innerHTML = `
-            <h2>🎯 تم تسليم الامتحان</h2>
-            <p><strong>👨‍🎓 الطالب:</strong> ${studentName}</p>
-            <div class="result-score">${studentScore} / ${appState.totalMarks}</div>
-            <p>📊 النسبة: ${percentage}%</p>
-        `;
-        document.getElementById('review-container').innerHTML = reviewHTML;
-    });
-
-    function showError(message) {
-        const statusEl = document.getElementById('status-message');
-        statusEl.innerHTML = `<div class="error-text">⚠️ ${message}</div>`;
-        setTimeout(() => { if (statusEl.innerHTML.includes('error-text')) statusEl.innerHTML = ''; }, 8000);
-        document.getElementById('start-btn').disabled = false;
-        document.getElementById('start-btn').innerHTML = '🚀 استخراج المحتوى وإنشاء الامتحان';
     }
 </script>
 </body>
