@@ -104,6 +104,11 @@ label{font-size:12px;color:var(--muted);font-weight:600;display:block;margin-bot
 .toast.error{border-color:var(--danger);color:#fca5a5}
 @keyframes slideUp{from{transform:translate(-50%,20px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
 .katex-display { margin: 10px 0; overflow-x: auto; overflow-y: hidden; }
+
+/* تنسيق إضافي لرسالة الخطأ */
+.error-box { background: rgba(239, 68, 68, 0.1); border: 1px solid var(--danger); padding: 12px; border-radius: 10px; margin-top: 10px; text-align: right; }
+.error-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; color: #fca5a5; font-weight: bold; }
+.error-content { font-family: monospace; font-size: 12px; color: #f87171; white-space: pre-wrap; word-break: break-word; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 6px; }
 </style>
 </head>
 <body>
@@ -129,9 +134,9 @@ label{font-size:12px;color:var(--muted);font-weight:600;display:block;margin-bot
 <section class="card">
   <h2><span class="ico">🤖</span> نموذج الذكاء الاصطناعي</h2>
   <select class="select" id="model">
-    <option value="gemini-1.5-flash-latest" selected>Gemini 1.5 Flash (سريع وممتاز للامتحانات)</option>
-    <option value="gemini-1.5-pro-latest">Gemini 1.5 Pro (عالي الدقة والتحليل الرياضي)</option>
-    <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+    <option value="gemini-1.5-flash" selected>Gemini 1.5 Flash (سريع وممتاز للامتحانات)</option>
+    <option value="gemini-1.5-pro">Gemini 1.5 Pro (عالي الدقة والتحليل الرياضي)</option>
+    <option value="gemini-2.0-flash-exp">Gemini 2.0 Flash (الإصدار التجريبي الأحدث)</option>
   </select>
 </section>
 
@@ -293,7 +298,7 @@ document.getElementById('sourceTabs').addEventListener('click',e=>{
   document.querySelectorAll('[data-pane]').forEach(p=>p.hidden = p.dataset.pane!==t.dataset.tab);
 });
 
-function toast(msg, type=''){ const el = document.createElement('div'); el.className = 'toast '+type; el.textContent = msg; document.body.appendChild(el); setTimeout(()=>el.remove(), 3500); }
+function toast(msg, type=''){ const el = document.createElement('div'); el.className = 'toast '+type; el.textContent = msg; document.body.appendChild(el); setTimeout(()=>el.remove(), 4000); }
 function fileToDataURL(f){return new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result);fr.readAsDataURL(f)})}
 function bindDz(dzId, inputId, handler){
   const dz = document.getElementById(dzId), inp = document.getElementById(inputId);
@@ -313,7 +318,6 @@ bindDz('dzImage','fileImage', async files=>{
   saveWorkspace(); renderExtracted();
 });
 
-// التحديث لإصدار 3.11
 if(window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
 bindDz('dzFile','fileFile', async files=>{
@@ -382,12 +386,21 @@ document.getElementById('extractedPreview').addEventListener('input',e=>{ state.
 
 window.adjustNum = function(d){ const i = document.getElementById('numQ'); i.value = Math.max(1,Math.min(50, (+i.value||1)+d)); }
 
+/* ============== نسخ الخطأ ============== */
+window.copyError = function(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        toast('✅ تم نسخ تفاصيل الخطأ!', 'success');
+    }).catch(err => {
+        toast('❌ فشل النسخ التلقائي.', 'error');
+    });
+};
+
 /* ============== API & JSON SCHEMA ============== */
 document.getElementById('generateBtn').onclick = async ()=>{
   const btn = document.getElementById('generateBtn'); const status = document.getElementById('genStatus');
   const num = +document.getElementById('numQ').value||5; const points = +document.getElementById('pointsPer').value||2; const notes = document.getElementById('notes').value;
 
-  if(!state.source.text && !state.source.images.length) return toast('مساحة العمل فارغة!','error');
+  if(!state.source.text && !state.source.images.length) return toast('مساحة العمل فارغة! يرجى إضافة محتوى','error');
   const validKeys = state.keys.filter(k=>k.trim()); if(!validKeys.length) return toast('أضف مفتاح API أولاً','error');
 
   const prompt = `أنت معلم خبير. أنشئ امتحان اختيار من متعدد بناءً على المحتوى المرفق.
@@ -400,13 +413,23 @@ document.getElementById('generateBtn').onclick = async ()=>{
 
   const schema = { type: "OBJECT", properties: { questions: { type: "ARRAY", items: { type: "OBJECT", properties: { question: {type: "STRING"}, options: {type: "ARRAY", items: {type: "STRING"}}, correct: {type: "INTEGER"}, explanation: {type: "STRING"} }, required: ["question", "options", "correct", "explanation"] } } }, required: ["questions"] };
 
-  btn.disabled = true; status.innerHTML = `<div class="processing"><span class="loader"></span> جاري التحليل وصياغة الأسئلة...</div>`;
+  btn.disabled = true; status.innerHTML = `<div class="processing"><span class="loader"></span> جاري التحليل المعرفي وصياغة الأسئلة...</div>`;
   try{
     const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${document.getElementById('model').value}:generateContent?key=${validKeys[0]}`,{
       method:'POST', headers:{'Content-Type':'application/json'},
       body:JSON.stringify({ contents:[{parts}], generationConfig: { temperature: 0.4, responseMimeType: 'application/json', responseSchema: schema } })
     });
-    if(!res.ok) throw new Error("خطأ في الاتصال بالـ API");
+    
+    if(!res.ok) {
+        const errText = await res.text();
+        let errMsg = `خطأ HTTP ${res.status}: ${res.statusText}`;
+        try {
+            const errJson = JSON.parse(errText);
+            if(errJson.error && errJson.error.message) { errMsg += `\nالسبب: ${errJson.error.message}`; }
+        } catch(e) { errMsg += `\nالتفاصيل: ${errText}`; }
+        throw new Error(errMsg);
+    }
+    
     const data = await res.json();
     const json = JSON.parse(data.candidates[0].content.parts[0].text);
     state.questions = (json.questions||[]).map(q=>({ question:q.question, options:q.options||[], correct:q.correct??0, explanation:q.explanation||'', points }));
@@ -415,8 +438,21 @@ document.getElementById('generateBtn').onclick = async ()=>{
     document.getElementById('questionsSection').hidden = false; document.getElementById('exportSection').hidden = false;
     status.innerHTML = ''; toast('✅ تم التوليد بنجاح!','success');
     document.getElementById('questionsSection').scrollIntoView({behavior:'smooth'});
-  }catch(err){ status.innerHTML = `<div class="file-info" style="border-color:var(--danger)">❌ حدث خطأ: ${err.message}</div>`; }
-  finally{ btn.disabled = false; }
+  }catch(err){ 
+      let errorDetails = err.message || "حدث خطأ غير معروف في الاتصال.";
+      if(err.name === 'TypeError' && err.message === 'Failed to fetch') {
+          errorDetails += "\n(قد يكون السبب انقطاع الإنترنت، مشكلة CORS، أو حظر المتصفح للاتصال).";
+      }
+      const encodedError = encodeURIComponent(errorDetails);
+      status.innerHTML = `
+          <div class="error-box">
+              <div class="error-header">
+                  <span>❌ فشل الاتصال بالـ API</span>
+                  <button class="btn btn-ghost" style="padding: 4px 10px; font-size: 11px; height: fit-content;" type="button" onclick="copyError(decodeURIComponent('${encodedError}'))">📋 نسخ الخطأ</button>
+              </div>
+              <div class="error-content">${errorDetails}</div>
+          </div>`;
+  } finally{ btn.disabled = false; }
 };
 
 /* ============== محرر الأسئلة ============== */
