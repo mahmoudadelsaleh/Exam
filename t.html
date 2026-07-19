@@ -15,47 +15,34 @@
 
     <style>
         :root {
-            --bg: #0B1220;
-            --surface: #121B2E;
-            --surface-2: #1A2540;
-            --border: #263251;
-            --gold: #D4A954;
-            --gold-dim: #8A7038;
-            --teal: #4FB6A6;
-            --red: #E2695B;
-            --text: #ECEFF6;
-            --text-mute: #8A93A6;
-            --radius: 14px;
+            --bg: #0B1220; --surface: #121B2E; --surface-2: #1A2540; --border: #263251;
+            --gold: #D4A954; --gold-dim: #8A7038; --teal: #4FB6A6; --red: #E2695B;
+            --text: #ECEFF6; --text-mute: #8A93A6; --radius: 14px;
+            --kbd-bg: #0C1424; --key-bg: #1A2540; --key-press: #263251; --key-func: #121B2E;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        html, body {
-            margin: 0; padding: 0; min-height: 100%;
-            background: radial-gradient(circle at 50% 0%, #16213A 0%, var(--bg) 55%);
-            color: var(--text); font-family: 'Tajawal', sans-serif;
-        }
-
+        html, body { margin: 0; padding: 0; min-height: 100%; background: radial-gradient(circle at 50% 0%, #16213A 0%, var(--bg) 55%); color: var(--text); font-family: 'Tajawal', sans-serif; }
         .latin, input, textarea, .kbd-key.num, .badge-count { font-family: 'JetBrains Mono', monospace; }
 
-        .topbar {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 16px 22px; background: linear-gradient(180deg, rgba(18,27,46,.95), rgba(18,27,46,.7));
-            border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 20; backdrop-filter: blur(8px);
-        }
+        /* ===== Header & Containers ===== */
+        .topbar { display: flex; align-items: center; justify-content: space-between; padding: 16px 22px; background: linear-gradient(180deg, rgba(18,27,46,.95), rgba(18,27,46,.7)); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 20; backdrop-filter: blur(8px); }
         .topbar h1 { font-family: 'Cairo', sans-serif; font-weight: 800; font-size: 18px; margin: 0; color: var(--gold); }
         .topbar .sub { font-size: 12px; color: var(--text-mute); margin-top: 2px; }
         .count-badge { background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px; padding: 7px 16px; font-size: 13px; color: var(--text-mute); }
         .count-badge .latin { color: var(--teal); font-weight: 700; }
-
-        .wrap { max-width: 780px; margin: 0 auto; padding: 20px 22px 260px; }
+        .wrap { max-width: 780px; margin: 0 auto; padding: 20px 22px 340px; }
+        
+        /* ===== Forms & Inputs ===== */
         .exam-title-row { margin-bottom: 20px; }
         .exam-title-row label { font-size: 13px; color: var(--text-mute); display: block; margin-bottom: 6px; }
-        .exam-title-field {
-            width: 100%; background: var(--surface); border: 1.5px solid var(--border);
-            border-radius: 12px; padding: 14px 16px; font-family: 'Cairo', sans-serif; font-weight: 700; font-size: 17px; color: var(--text);
-        }
-        .exam-title-field:focus, .exam-title-field.active-field { outline: none; border-color: var(--teal); }
+        .exam-title-field, .q-text-field, .option-field { width: 100%; background: var(--bg); border: 1.5px solid var(--border); border-radius: 12px; color: var(--text); padding: 14px 16px; transition: all .2s; }
+        .exam-title-field { font-family: 'Cairo', sans-serif; font-weight: 700; font-size: 17px; background: var(--surface); }
+        .q-text-field { min-height: 90px; resize: vertical; font-size: 16px; line-height: 2; caret-color: var(--gold); }
+        .option-field { padding: 11px 14px; font-size: 15px; border-radius: 10px; }
+        .active-field, .exam-title-field:focus, .q-text-field:focus, .option-field:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px rgba(79,182,166,.12); }
 
+        /* ===== Cards & Layout ===== */
         .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; box-shadow: 0 20px 40px -20px rgba(0,0,0,.5); margin-bottom: 24px; }
         .card h2 { font-family: 'Cairo', sans-serif; font-size: 16px; color: var(--gold); margin: 0 0 18px; }
         .type-toggle { display: flex; gap: 10px; margin-bottom: 18px; }
@@ -64,26 +51,23 @@
         .field-group { margin-bottom: 18px; }
         .field-group label { font-size: 13px; color: var(--text-mute); display: block; margin-bottom: 8px; }
         
-        .q-text-field { width: 100%; min-height: 90px; resize: vertical; background: var(--bg); border: 1.5px solid var(--border); border-radius: 12px; color: var(--text); font-size: 16px; line-height: 2; padding: 14px 16px; caret-color: var(--gold); }
-        .q-text-field:focus, .q-text-field.active-field { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px rgba(79,182,166,.12); }
-        
         .options-grid { display: flex; flex-direction: column; gap: 10px; }
         .option-row { display: flex; align-items: center; gap: 10px; }
         .option-letter { width: 38px; height: 38px; border-radius: 9px; flex-shrink: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; background: var(--surface-2); border: 1.5px solid var(--border); color: var(--gold); font-family: 'JetBrains Mono', monospace; font-weight: 700; transition: all .12s; }
         .option-letter.correct { background: var(--teal); border-color: var(--teal); color: #06201B; }
-        .option-field { flex: 1; background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; padding: 11px 14px; color: var(--text); font-size: 15px; }
-        .option-field:focus, .option-field.active-field { outline: none; border-color: var(--teal); }
         .options-hint { font-size: 12px; color: var(--text-mute); margin-top: 2px; }
 
+        /* ===== Buttons ===== */
         .composer-actions { display: flex; gap: 10px; margin-top: 6px; }
-        .btn { font-family: 'Cairo', sans-serif; font-weight: 700; font-size: 14.5px; border: none; border-radius: 10px; padding: 12px 22px; cursor: pointer; transition: transform .1s, filter .15s; display: inline-flex; align-items: center; justify-content: center; gap: 6px;}
+        .btn { font-family: 'Cairo', sans-serif; font-weight: 700; font-size: 14.5px; border: none; border-radius: 10px; padding: 12px 22px; cursor: pointer; transition: transform .1s, filter .15s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
         .btn:active { transform: scale(.97); }
         .btn-ghost { background: var(--surface-2); color: var(--text); border: 1px solid var(--border); }
         .btn-ghost:hover { filter: brightness(1.15); }
         .btn-primary { background: linear-gradient(135deg, var(--gold), #B98B3D); color: #221705; }
         .btn-primary:hover { filter: brightness(1.08); }
-        .btn-teal { background: linear-gradient(135deg, var(--teal), #2F8A7C); color: #06201B; }
+        .btn-teal { background: linear-gradient(135deg, var(--teal), #2F8A7C); color: #06201B; width: 100%; }
 
+        /* ===== Exam List ===== */
         .list-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
         .list-header h2 { font-family: 'Cairo', sans-serif; font-size: 16px; color: var(--text); margin: 0; }
         .empty-state { text-align: center; padding: 40px 20px; color: var(--text-mute); font-size: 14px; border: 1.5px dashed var(--border); border-radius: 12px; }
@@ -100,43 +84,57 @@
         .icon-btn.danger:hover { border-color: var(--red); color: var(--red); }
         .icon-btn:hover:not(.danger) { border-color: var(--gold-dim); color: var(--gold); }
         .export-row { display: flex; gap: 10px; margin-top: 20px; }
-        .export-row .btn { flex: 1; }
 
-        /* الكيبورد الافتراضي */
-        .kbd-panel { position: fixed; bottom: 0; left: 0; right: 0; z-index: 30; background: linear-gradient(180deg, #101A2E, #0C1424); border-top: 1px solid var(--border); box-shadow: 0 -18px 40px -12px rgba(0,0,0,.55); transform: translateY(calc(100% - 46px)); transition: transform .28s ease; }
+        /* ===== UNIFIED GBOARD KEYBOARD ===== */
+        .kbd-panel { position: fixed; bottom: 0; left: 0; right: 0; z-index: 30; background: var(--kbd-bg); border-top: 1px solid var(--border); box-shadow: 0 -18px 40px -12px rgba(0,0,0,.6); transform: translateY(calc(100% - 38px)); transition: transform .3s cubic-bezier(0.2, 0.8, 0.2, 1); user-select: none; }
         .kbd-panel.open { transform: translateY(0); }
-        .kbd-drag { height: 46px; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; position: relative; }
-        .kbd-drag .grip { width: 38px; height: 4px; border-radius: 2px; background: var(--border); }
-        .kbd-drag .drag-label { position: absolute; right: 20px; font-size: 12px; color: var(--text-mute); }
+        .kbd-drag { height: 38px; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; position: relative; }
+        .kbd-drag .grip { width: 40px; height: 5px; border-radius: 3px; background: var(--border); }
+        .kbd-drag .drag-label { position: absolute; right: 16px; font-size: 11px; color: var(--text-mute); font-family: 'Cairo', sans-serif; }
         .kbd-drag .drag-label.active { color: var(--teal); }
-        .kbd-tabs { display: flex; gap: 8px; padding: 0 16px 10px; overflow-x: auto; scrollbar-width: none; }
-        .kbd-tabs::-webkit-scrollbar { display: none; }
-        .kbd-tab { font-family: 'Cairo', sans-serif; font-weight: 700; font-size: 13px; padding: 7px 16px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text-mute); cursor: pointer; white-space: nowrap; }
-        .kbd-tab.active { background: var(--gold); color: #221705; border-color: var(--gold); }
-        .kbd-tab.math-tab.active { background: var(--teal); color: #06201B; border-color: var(--teal); }
 
-        .kbd-body { padding: 0 12px 16px; max-width: 780px; margin: 0 auto; }
-        .kbd-rows { display: flex; flex-direction: column; gap: 8px; }
-        .kbd-row { display: flex; gap: 6px; justify-content: center; width: 100%; }
-        .kbd-key { flex: 1; max-width: 52px; height: 46px; display: flex; align-items: center; justify-content: center; background: var(--surface-2); border: 1px solid var(--border); border-radius: 9px; color: var(--text); font-size: 17px; cursor: pointer; user-select: none; transition: background .1s, transform .05s; }
-        .kbd-key:active { background: var(--gold-dim); transform: scale(.94); }
-        .kbd-key.wide { max-width: 120px; flex: 2; font-size: 13px; font-family: 'Cairo', sans-serif; font-weight: 700; }
-        .kbd-key.shift { max-width: 60px; flex: 1.5; font-size: 14px; background: var(--border); }
-        .kbd-key.shift.active { background: var(--gold); color: #221705; }
-        .kbd-key.space { max-width: none; flex: 6; }
-        .kbd-key.func { color: var(--gold); border-color: var(--gold-dim); }
+        .kbd-body { padding: 4px 6px 12px; max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 8px; }
+        .kbd-row { display: flex; gap: 5px; justify-content: center; width: 100%; }
+        
+        .kbd-key { flex: 1; height: 46px; display: flex; align-items: center; justify-content: center; background: var(--key-bg); border-radius: 8px; color: var(--text); font-size: 18px; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,.3); position: relative; transition: background .1s, transform .05s; }
+        .kbd-key.latin-key { font-family: 'JetBrains Mono', monospace; }
+        .kbd-key:active { background: var(--key-press); transform: scale(.95); }
+        
+        .kbd-key.func { background: var(--key-func); font-size: 14px; font-family: 'Cairo', sans-serif; color: var(--text-mute); }
+        .kbd-key.func:active { background: var(--gold-dim); color: #fff; }
+        .kbd-key.shift.active { background: var(--gold); color: #000; }
+        
+        /* Spacing and Widths */
+        .kbd-key.wide-1-5 { flex: 1.5; }
+        .kbd-key.wide-2 { flex: 2; }
+        .kbd-key.space { flex: 5; font-size: 13px; color: var(--text-mute); }
+        .kbd-key.enter { background: var(--teal); color: #06201B; flex: 1.5; font-weight: 700; }
+        
+        /* ===== MathType Mode Panel ===== */
+        .math-mode-container { display: none; flex-direction: column; gap: 12px; padding: 0 6px 12px; max-width: 800px; margin: 0 auto; }
+        math-field { width: 100%; min-height: 56px; border-radius: 10px; border: 1.5px solid var(--gold); background: var(--surface); font-size: 22px; padding: 8px 12px; box-shadow: inset 0 2px 6px rgba(0,0,0,.3); outline: none; }
+        
+        .math-tabs { display: flex; overflow-x: auto; gap: 8px; padding-bottom: 4px; scrollbar-width: none; }
+        .math-tabs::-webkit-scrollbar { display: none; }
+        .m-tab { padding: 6px 14px; font-size: 13px; border-radius: 20px; background: var(--surface-2); color: var(--text-mute); border: 1px solid transparent; cursor: pointer; white-space: nowrap; font-family: 'Cairo', sans-serif; font-weight: 700; }
+        .m-tab.active { background: rgba(212,169,84,.15); color: var(--gold); border-color: var(--gold); }
+        
+        .math-palettes { background: var(--surface-2); border-radius: 10px; padding: 8px; min-height: 140px; }
+        .palette-grid { display: none; grid-template-columns: repeat(auto-fill, minmax(45px, 1fr)); gap: 6px; }
+        .palette-grid.active { display: grid; }
+        .math-btn { height: 42px; background: var(--key-func); border-radius: 6px; border: 1px solid var(--border); color: var(--gold); display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; transition: all .1s; }
+        .math-btn:active { background: var(--gold); color: #000; transform: scale(.92); }
 
-        .math-panel { display: flex; flex-direction: column; gap: 12px; align-items: center; }
-        math-field { width: 100%; min-height: 52px; border-radius: 10px; border: 1.5px solid var(--gold-dim); background: var(--bg); font-size: 19px; padding: 6px 10px; }
-        .math-shortcuts { display: flex; gap: 8px; width: 100%; }
-        .math-shortcuts .btn { flex: 1; font-size: 13px; padding: 8px; font-family: 'JetBrains Mono', monospace; }
-        .math-actions { display: flex; gap: 10px; width: 100%; }
-        .math-actions .btn { flex: 1; }
-
+        .math-bottom { display: flex; gap: 10px; margin-top: 6px; }
+        
         .toast { position: fixed; top: 18px; left: 50%; transform: translateX(-50%) translateY(-20px); background: var(--surface-2); border: 1px solid var(--teal); color: var(--text); padding: 10px 20px; border-radius: 10px; font-size: 14px; z-index: 100; opacity: 0; transition: opacity .25s, transform .25s; pointer-events: none; }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-        @media (max-width: 520px) { .q-text-field { font-size: 15px; } .kbd-key { height: 42px; font-size: 15px; } }
+        @media (max-width: 520px) { 
+            .kbd-key { height: 42px; font-size: 16px; border-radius: 6px; }
+            .kbd-row { gap: 4px; }
+            .math-btn { height: 38px; }
+        }
     </style>
 </head>
 <body>
@@ -157,22 +155,18 @@
 
         <div class="card">
             <h2 id="composerHeading">سؤال جديد</h2>
-            
             <div class="type-toggle">
                 <div class="type-btn active" data-type="mcq">اختياري (4 خيارات)</div>
                 <div class="type-btn" data-type="essay">مقالي</div>
             </div>
-
             <div class="field-group">
                 <label>نص السؤال</label>
                 <textarea class="q-text-field answer-field" id="qTextField" readonly inputmode="none" placeholder="اضغط هنا واكتب نص السؤال"></textarea>
             </div>
-
             <div class="field-group" id="optionsWrap">
                 <label>الخيارات — اضغط على الحرف لتحديد الإجابة الصحيحة</label>
                 <div class="options-grid" id="optionsGrid"></div>
             </div>
-
             <div class="composer-actions">
                 <button class="btn btn-primary" id="addQuestionBtn">إضافة السؤال</button>
                 <button class="btn btn-ghost" id="clearComposerBtn">مسح الحقول</button>
@@ -191,88 +185,89 @@
         </div>
     </div>
 
-    <!-- لوحة المفاتيح الافتراضية -->
+    <!-- Unified Keyboard Container -->
     <div class="kbd-panel" id="kbdPanel">
         <div class="kbd-drag" id="kbdDrag">
-            <span class="drag-label" id="dragLabel">اضغط على أي حقل للكتابة</span>
+            <span class="drag-label" id="dragLabel">اضغط على حقل للكتابة</span>
             <div class="grip"></div>
         </div>
-        <div class="kbd-tabs">
-            <button class="kbd-tab active" data-tab="letters">أ عربي</button>
-            <button class="kbd-tab" data-tab="english" style="font-family:'JetBrains Mono',monospace;">Abc</button>
-            <button class="kbd-tab" data-tab="numbers">١٢٣ أرقام</button>
-            <button class="kbd-tab math-tab" data-tab="math">∑ معادلة</button>
-        </div>
-        <div class="kbd-body">
+        
+        <!-- Standard Text/Symbol Engine -->
+        <div class="kbd-body" id="kbdBody"></div>
+
+        <!-- MathType Engine -->
+        <div class="math-mode-container" id="mathContainer">
+            <math-field id="mathField" virtual-keyboard-mode="manual"></math-field>
             
-            <!-- تبويب الحروف العربية -->
-            <div class="kbd-panel-view" id="view-letters">
-                <div class="kbd-rows">
-                    <div class="kbd-row" id="rowAr1"></div>
-                    <div class="kbd-row" id="rowAr2"></div>
-                    <div class="kbd-row" id="rowAr3"></div>
-                    <div class="kbd-row">
-                        <div class="kbd-key wide func" data-action="backspace">⌫ حذف</div>
-                        <div class="kbd-key space" data-action="space">مسافة</div>
-                        <div class="kbd-key wide func" data-action="enter">↵ سطر</div>
-                    </div>
+            <div class="math-tabs">
+                <div class="m-tab active" data-target="pal-basic">كسور وجذور</div>
+                <div class="m-tab" data-target="pal-calc">تفاضل وتكامل</div>
+                <div class="m-tab" data-target="pal-matrix">مصفوفات وأقواس</div>
+                <div class="m-tab" data-target="pal-symbols">رموز يونانية</div>
+            </div>
+            
+            <div class="math-palettes">
+                <!-- Basic Fractions & Roots -->
+                <div class="palette-grid active" id="pal-basic">
+                    <button class="math-btn" data-cmd="\frac{#0}{#0}">$$ \frac{x}{y} $$</button>
+                    <button class="math-btn" data-cmd="^{#0}">$$ x^2 $$</button>
+                    <button class="math-btn" data-cmd="_{#0}">$$ x_2 $$</button>
+                    <button class="math-btn" data-cmd="\sqrt{#0}">$$ \sqrt{x} $$</button>
+                    <button class="math-btn" data-cmd="\sqrt[#0]{#0}">$$ \sqrt[n]{x} $$</button>
+                    <button class="math-btn" data-cmd="\pm">$$ \pm $$</button>
+                    <button class="math-btn" data-cmd="\times">$$ \times $$</button>
+                    <button class="math-btn" data-cmd="\div">$$ \div $$</button>
+                    <button class="math-btn" data-cmd="\neq">$$ \neq $$</button>
+                    <button class="math-btn" data-cmd="\approx">$$ \approx $$</button>
+                    <button class="math-btn" data-cmd="\log_{#0}(#0)">$$ \log $$</button>
+                    <button class="math-btn" data-cmd="\ln(#0)">$$ \ln $$</button>
+                </div>
+                <!-- Calculus -->
+                <div class="palette-grid" id="pal-calc">
+                    <button class="math-btn" data-cmd="\int">$$ \int $$</button>
+                    <button class="math-btn" data-cmd="\int_{#0}^{#0}">$$ \int_a^b $$</button>
+                    <button class="math-btn" data-cmd="\iint">$$ \iint $$</button>
+                    <button class="math-btn" data-cmd="\sum">$$ \sum $$</button>
+                    <button class="math-btn" data-cmd="\sum_{#0}^{#0}">$$ \sum_a^b $$</button>
+                    <button class="math-btn" data-cmd="\prod">$$ \prod $$</button>
+                    <button class="math-btn" data-cmd="\lim_{#0 \to #0}">$$ \lim $$</button>
+                    <button class="math-btn" data-cmd="\infty">$$ \infty $$</button>
+                    <button class="math-btn" data-cmd="\partial">$$ \partial $$</button>
+                    <button class="math-btn" data-cmd="\nabla">$$ \nabla $$</button>
+                    <button class="math-btn" data-cmd="d">$$ d $$</button>
+                    <button class="math-btn" data-cmd="e">$$ e $$</button>
+                </div>
+                <!-- Matrices & Brackets -->
+                <div class="palette-grid" id="pal-matrix">
+                    <button class="math-btn" data-cmd="\left( #0 \right)">$$ () $$</button>
+                    <button class="math-btn" data-cmd="\left[ #0 \right]">$$ [] $$</button>
+                    <button class="math-btn" data-cmd="\left\{ #0 \right\}">$$ \{\} $$</button>
+                    <button class="math-btn" data-cmd="\left| #0 \right|">$$ || $$</button>
+                    <button class="math-btn" style="grid-column: span 2;" data-cmd="\begin{pmatrix}#0 & #0 \\ #0 & #0\end{pmatrix}">مصفوفة () 2x2</button>
+                    <button class="math-btn" style="grid-column: span 2;" data-cmd="\begin{bmatrix}#0 & #0 \\ #0 & #0\end{bmatrix}">مصفوفة [] 2x2</button>
+                    <button class="math-btn" style="grid-column: span 2;" data-cmd="\begin{vmatrix}#0 & #0 \\ #0 & #0\end{vmatrix}">محدد || 2x2</button>
+                </div>
+                <!-- Greek & Sets -->
+                <div class="palette-grid" id="pal-symbols">
+                    <button class="math-btn" data-cmd="\alpha">$$ \alpha $$</button>
+                    <button class="math-btn" data-cmd="\beta">$$ \beta $$</button>
+                    <button class="math-btn" data-cmd="\theta">$$ \theta $$</button>
+                    <button class="math-btn" data-cmd="\pi">$$ \pi $$</button>
+                    <button class="math-btn" data-cmd="\mu">$$ \mu $$</button>
+                    <button class="math-btn" data-cmd="\Delta">$$ \Delta $$</button>
+                    <button class="math-btn" data-cmd="\Omega">$$ \Omega $$</button>
+                    <button class="math-btn" data-cmd="\in">$$ \in $$</button>
+                    <button class="math-btn" data-cmd="\notin">$$ \notin $$</button>
+                    <button class="math-btn" data-cmd="\subset">$$ \subset $$</button>
+                    <button class="math-btn" data-cmd="\cup">$$ \cup $$</button>
+                    <button class="math-btn" data-cmd="\cap">$$ \cap $$</button>
                 </div>
             </div>
 
-            <!-- تبويب الحروف الإنجليزية -->
-            <div class="kbd-panel-view" id="view-english" style="display:none;">
-                <div class="kbd-rows">
-                    <div class="kbd-row latin" id="rowEn1"></div>
-                    <div class="kbd-row latin" id="rowEn2"></div>
-                    <div class="kbd-row">
-                        <div class="kbd-key shift" id="shiftBtn">⬆ Shift</div>
-                        <div class="kbd-row latin" id="rowEn3" style="flex:4; gap:6px;"></div>
-                    </div>
-                    <div class="kbd-row">
-                        <div class="kbd-key wide func" data-action="backspace">⌫ حذف</div>
-                        <div class="kbd-key space" data-action="space">مسافة</div>
-                        <div class="kbd-key wide func" data-action="enter">↵ سطر</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- تبويب الأرقام والرموز -->
-            <div class="kbd-panel-view" id="view-numbers" style="display:none;">
-                <div class="kbd-rows">
-                    <div class="kbd-row" id="rowNum1"></div>
-                    <div class="kbd-row" id="rowNum2"></div>
-                    <div class="kbd-row">
-                        <div class="kbd-key wide func" data-action="backspace">⌫ حذف</div>
-                        <div class="kbd-key space" data-action="space">مسافة</div>
-                        <div class="kbd-key wide func" data-action="enter">↵ سطر</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- تبويب المعادلات -->
-            <div class="kbd-panel-view" id="view-math" style="display:none;">
-                <div class="math-panel">
-                    <!-- أزرار الاختصارات الرياضية السريعة -->
-                    <div class="math-shortcuts">
-                        <button class="btn btn-ghost" onmousedown="insertMathCmd('\\frac{#0}{#0}')" title="إدراج كسر">
-                            x/y كسر
-                        </button>
-                        <button class="btn btn-ghost" onmousedown="insertMathCmd('^{#0}')" title="أس أو حرف علوي">
-                            x² أس
-                        </button>
-                        <button class="btn btn-ghost" onmousedown="insertMathCmd('_{#0}')" title="دليل سفلي">
-                            x₂ أسفل
-                        </button>
-                    </div>
-
-                    <math-field id="mathField" virtual-keyboard-mode="onfocus" math-virtual-keyboard-policy="manual"></math-field>
-                    
-                    <div class="math-actions">
-                        <button class="btn btn-ghost" id="mathClearBtn">مسح</button>
-                        <button class="btn btn-ghost" id="mathCopyBtn">نسخ</button>
-                        <button class="btn btn-primary" id="mathInsertBtn">إدراج للنص</button>
-                    </div>
-                </div>
+            <div class="math-bottom">
+                <button class="btn btn-ghost" style="flex:1;" onclick="setKbMode('ar')">⌂ عودة للنص</button>
+                <button class="btn btn-ghost" style="flex:0.5;" id="mathClearBtn">مسح</button>
+                <button class="btn btn-primary" style="flex:1.5;" id="mathInsertBtn">إدراج المعادلة ✓</button>
             </div>
         </div>
     </div>
@@ -280,22 +275,15 @@
     <div class="toast" id="toast"></div>
 
     <script>
-        /* ================= إعدادات واجهة الامتحانات ================= */
-        let currentType = 'mcq';
-        let editingIndex = null;
-        const exam = { title: '', questions: [] };
-        const optionsGrid = document.getElementById('optionsGrid');
-        let correctKey = null;
+        /* ================= EXAM STATE & UI ================= */
+        let currentType = 'mcq'; let editingIndex = null; const exam = { title: '', questions: [] };
+        const optionsGrid = document.getElementById('optionsGrid'); let correctKey = null;
 
         function buildOptionRows() {
             optionsGrid.innerHTML = '';
             ['a', 'b', 'c', 'd'].forEach(key => {
-                const row = document.createElement('div');
-                row.className = 'option-row';
-                row.innerHTML = `
-                    <div class="option-letter latin" data-key="${key}">${key}</div>
-                    <input type="text" class="option-field answer-field" data-opt="${key}" readonly inputmode="none" placeholder="نص الخيار ${key}">
-                `;
+                const row = document.createElement('div'); row.className = 'option-row';
+                row.innerHTML = `<div class="option-letter latin" data-key="${key}">${key}</div><input type="text" class="option-field answer-field" data-opt="${key}" readonly inputmode="none" placeholder="نص الخيار ${key}">`;
                 optionsGrid.appendChild(row);
             });
             optionsGrid.querySelectorAll('.option-letter').forEach(el => {
@@ -311,63 +299,42 @@
         document.querySelectorAll('.type-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                currentType = btn.dataset.type;
+                btn.classList.add('active'); currentType = btn.dataset.type;
                 document.getElementById('optionsWrap').style.display = currentType === 'mcq' ? 'block' : 'none';
             });
         });
 
         const qTextField = document.getElementById('qTextField');
         document.getElementById('addQuestionBtn').addEventListener('click', () => {
-            const text = qTextField.value.trim();
-            if (!text) return showToast('اكتب نص السؤال أولًا');
+            const text = qTextField.value.trim(); if (!text) return showToast('اكتب نص السؤال أولًا');
             let question = { type: currentType, text };
             if (currentType === 'mcq') {
-                const options = [];
-                let allFilled = true;
+                const options = []; let allFilled = true;
                 optionsGrid.querySelectorAll('.option-field').forEach(f => {
-                    const val = f.value.trim();
-                    if (!val) allFilled = false;
+                    const val = f.value.trim(); if (!val) allFilled = false;
                     options.push({ key: f.dataset.opt, text: val });
                 });
                 if (!allFilled) return showToast('اكتب كل الخيارات الأربعة');
-                if (!correctKey) return showToast('حدد الإجابة الصحيحة بالضغط على الحرف');
-                question.options = options;
-                question.answer = correctKey;
+                if (!correctKey) return showToast('حدد الإجابة الصحيحة');
+                question.options = options; question.answer = correctKey;
             }
-            if (editingIndex !== null) {
-                exam.questions[editingIndex] = question;
-                editingIndex = null;
-                document.getElementById('composerHeading').textContent = 'سؤال جديد';
-            } else exam.questions.push(question);
-            resetComposer();
-            renderList();
-            showToast('تم حفظ السؤال ✓');
+            if (editingIndex !== null) { exam.questions[editingIndex] = question; editingIndex = null; document.getElementById('composerHeading').textContent = 'سؤال جديد'; } 
+            else exam.questions.push(question);
+            resetComposer(); renderList(); showToast('تم الحفظ ✓');
         });
 
         document.getElementById('clearComposerBtn').addEventListener('click', resetComposer);
-        function resetComposer() {
-            qTextField.value = ''; correctKey = null; buildOptionRows();
-            editingIndex = null; document.getElementById('composerHeading').textContent = 'سؤال جديد';
-            hideKeyboard();
-        }
+        function resetComposer() { qTextField.value = ''; correctKey = null; buildOptionRows(); editingIndex = null; document.getElementById('composerHeading').textContent = 'سؤال جديد'; hideKeyboard(); }
 
         function renderList() {
-            const listEl = document.getElementById('questionList');
-            const empty = document.getElementById('emptyState');
+            const listEl = document.getElementById('questionList'); const empty = document.getElementById('emptyState');
             document.getElementById('qCountBadge').textContent = exam.questions.length;
-            if (exam.questions.length === 0) {
-                listEl.innerHTML = ''; empty.style.display = 'block'; return;
-            }
+            if (exam.questions.length === 0) { listEl.innerHTML = ''; empty.style.display = 'block'; return; }
             empty.style.display = 'none';
             listEl.innerHTML = exam.questions.map((q, i) => {
                 let optsHtml = '';
                 if (q.type === 'mcq') optsHtml = `<div class="q-item-options">` + q.options.map(o => `<span class="op ${o.key === q.answer ? 'correct' : ''}"><span class="latin">${o.key})</span> ${o.text}</span>`).join('') + `</div>`;
-                return `<div class="q-item">
-                    <div class="q-item-top"><span class="q-item-num">سؤال <span class="latin">${i + 1}</span></span><span class="q-item-type">${q.type === 'mcq' ? 'اختياري' : 'مقالي'}</span></div>
-                    <div class="q-item-text">${q.text}</div>${optsHtml}
-                    <div class="q-item-actions"><button class="icon-btn" data-edit="${i}">تعديل</button><button class="icon-btn danger" data-delete="${i}">حذف</button></div>
-                </div>`;
+                return `<div class="q-item"><div class="q-item-top"><span class="q-item-num">سؤال <span class="latin">${i + 1}</span></span><span class="q-item-type">${q.type === 'mcq' ? 'اختياري' : 'مقالي'}</span></div><div class="q-item-text">${q.text}</div>${optsHtml}<div class="q-item-actions"><button class="icon-btn" data-edit="${i}">تعديل</button><button class="icon-btn danger" data-delete="${i}">حذف</button></div></div>`;
             }).join('');
             renderMathInElement(listEl, { delimiters: [{ left: '$$', right: '$$', display: false }], throwOnError: false });
             listEl.querySelectorAll('[data-edit]').forEach(b => b.addEventListener('click', () => editQuestion(parseInt(b.dataset.edit))));
@@ -375,101 +342,173 @@
         }
 
         function editQuestion(i) {
-            const q = exam.questions[i];
-            editingIndex = i; document.getElementById('composerHeading').textContent = `تعديل السؤال ${i + 1}`;
-            currentType = q.type;
-            document.querySelectorAll('.type-btn').forEach(b => b.classList.toggle('active', b.dataset.type === q.type));
+            const q = exam.questions[i]; editingIndex = i; document.getElementById('composerHeading').textContent = `تعديل السؤال ${i + 1}`;
+            currentType = q.type; document.querySelectorAll('.type-btn').forEach(b => b.classList.toggle('active', b.dataset.type === q.type));
             document.getElementById('optionsWrap').style.display = q.type === 'mcq' ? 'block' : 'none';
             qTextField.value = q.text;
             if (q.type === 'mcq') {
                 buildOptionRows();
                 q.options.forEach(o => { const f = optionsGrid.querySelector(`[data-opt="${o.key}"]`); if (f) f.value = o.text; });
-                correctKey = q.answer;
-                optionsGrid.querySelectorAll('.option-letter').forEach(l => l.classList.toggle('correct', l.dataset.key === correctKey));
+                correctKey = q.answer; optionsGrid.querySelectorAll('.option-letter').forEach(l => l.classList.toggle('correct', l.dataset.key === correctKey));
             }
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         document.getElementById('exportBtn').addEventListener('click', () => {
-            if (exam.questions.length === 0) return showToast('أضف سؤالًا واحدًا على الأقل');
+            if (exam.questions.length === 0) return showToast('أضف سؤالًا أولاً');
             exam.title = document.getElementById('examTitle').value.trim() || 'امتحان بدون عنوان';
             const blob = new Blob([JSON.stringify(exam, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a'); a.href = url; a.download = 'exam.json'; a.click();
-            URL.revokeObjectURL(url); showToast('تم تنزيل ملف الامتحان ✓');
+            const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'exam.json'; a.click(); URL.revokeObjectURL(url); showToast('تم التنزيل ✓');
         });
         document.getElementById('previewBtn').addEventListener('click', () => {
-            if (exam.questions.length === 0) return showToast('أضف سؤالًا واحدًا على الأقل');
-            console.log(JSON.stringify(exam, null, 2)); showToast('تم طباعة البيانات في Console');
+            if (exam.questions.length === 0) return showToast('أضف سؤالًا أولاً');
+            console.log(JSON.stringify(exam, null, 2)); showToast('تم الطباعة في Console');
         });
 
-        /* ================= لوحة المفاتيح الافتراضية ================= */
+        function showToast(msg) {
+            const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 1800);
+        }
+
+        /* ================= UNIFIED GBOARD ENGINE ================= */
         const kbdPanel = document.getElementById('kbdPanel');
+        const kbdBody = document.getElementById('kbdBody');
+        const mathContainer = document.getElementById('mathContainer');
         const dragLabel = document.getElementById('dragLabel');
-        let activeField = null; let caretPos = 0; let isShift = false;
+        
+        let activeField = null; let caretPos = 0;
+        let kbState = { lang: 'ar', shift: false }; // lang: ar, en, sym, math
 
-        const arabicRows = [
-            ['ض', 'ص', 'ث', 'ق', 'ف', 'غ', 'ع', 'ه', 'خ', 'ح'],
-            ['ج', 'د', 'ش', 'س', 'ي', 'ب', 'ل', 'ا', 'ت', 'ن'],
-            ['م', 'ك', 'ط', 'ئ', 'ء', 'ؤ', 'ر', 'لا', 'ى', 'ة'],
-        ];
-        const numberRows = [
-            ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
-            ['+', '-', '×', '÷', '=', '(', ')', '.', ',', '%'],
-        ];
-        const enLower = [
-            ['q','w','e','r','t','y','u','i','o','p'],
-            ['a','s','d','f','g','h','j','k','l'],
-            ['z','x','c','v','b','n','m']
-        ];
-        const enUpper = [
-            ['Q','W','E','R','T','Y','U','I','O','P'],
-            ['A','S','D','F','G','H','J','K','L'],
-            ['Z','X','C','V','B','N','M']
-        ];
+        // Layout Definitions (Gboard Style)
+        const layouts = {
+            ar: {
+                normal: [
+                    ['ض','ص','ث','ق','ف','غ','ع','ه','خ','ح','ج','د'],
+                    ['ش','س','ي','ب','ل','ا','ت','ن','م','ك','ط'],
+                    ['{shift}', 'ئ','ء','ؤ','ر','لا','ى','ة','و','ز','ظ', '{bksp}']
+                ],
+                shifted: [
+                    ['َ','ً','ُ','ٌ','ِ','ٍ','ّ','ْ','أ','إ','آ','ـ'],
+                    ['ش','س','ي','ب','ل','ا','ت','ن','م','ك','ط'],
+                    ['{shift}', 'ئ','ء','ؤ','ر','لا','ى','ة','و','ز','ظ', '{bksp}']
+                ]
+            },
+            en: {
+                normal: [
+                    ['q','w','e','r','t','y','u','i','o','p'],
+                    ['a','s','d','f','g','h','j','k','l'],
+                    ['{shift}', 'z','x','c','v','b','n','m', '{bksp}']
+                ],
+                shifted: [
+                    ['Q','W','E','R','T','Y','U','I','O','P'],
+                    ['A','S','D','F','G','H','J','K','L'],
+                    ['{shift}', 'Z','X','C','V','B','N','M', '{bksp}']
+                ]
+            },
+            sym: [
+                ['1','2','3','4','5','6','7','8','9','0'],
+                ['@','#','£','%','&','-','+','(',')','/'],
+                ['{sym_shift}', '*','"',"'",':',';','!','?','~', '{bksp}']
+            ]
+        };
 
-        function createKeyElement(ch, cls = '') {
-            const key = document.createElement('div');
-            key.className = 'kbd-key ' + cls;
-            key.textContent = ch;
-            key.addEventListener('mousedown', (e) => { e.preventDefault(); insertChar(key.textContent); });
-            key.addEventListener('touchstart', (e) => { e.preventDefault(); insertChar(key.textContent); }, { passive: false });
-            return key;
-        }
+        function renderKeyboard() {
+            if (kbState.lang === 'math') {
+                kbdBody.style.display = 'none';
+                mathContainer.style.display = 'flex';
+                // Render Math Palettes using Katex so they look beautiful
+                document.querySelectorAll('.math-btn').forEach(btn => {
+                    if (!btn.hasAttribute('data-rendered')) {
+                        renderMathInElement(btn, { delimiters: [{left:'$$', right:'$$', display:false}] });
+                        btn.setAttribute('data-rendered', 'true');
+                    }
+                });
+                return;
+            }
 
-        function buildKeys(rowIds, rows, cls = '') {
-            rowIds.forEach((rowId, i) => {
-                const rowEl = document.getElementById(rowId);
-                rowEl.innerHTML = '';
-                rows[i].forEach(ch => rowEl.appendChild(createKeyElement(ch, cls)));
+            kbdBody.style.display = 'flex';
+            mathContainer.style.display = 'none';
+            kbdBody.innerHTML = '';
+
+            let currentRows;
+            if (kbState.lang === 'sym') currentRows = layouts.sym;
+            else currentRows = kbState.shift ? layouts[kbState.lang].shifted : layouts[kbState.lang].normal;
+
+            currentRows.forEach(row => {
+                const rowEl = document.createElement('div');
+                rowEl.className = 'kbd-row';
+                row.forEach(key => {
+                    const btn = document.createElement('div');
+                    btn.className = 'kbd-key ' + (kbState.lang === 'en' || kbState.lang === 'sym' ? 'latin-key' : '');
+                    
+                    if (key === '{shift}') {
+                        btn.textContent = '⬆'; btn.className += ' func wide-1-5' + (kbState.shift ? ' active' : '');
+                        btn.onmousedown = (e) => { e.preventDefault(); kbState.shift = !kbState.shift; renderKeyboard(); };
+                    } 
+                    else if (key === '{sym_shift}') {
+                        btn.textContent = '=\\<'; btn.className += ' func wide-1-5'; // placeholder for extra symbols
+                        btn.onmousedown = (e) => { e.preventDefault(); };
+                    }
+                    else if (key === '{bksp}') {
+                        btn.textContent = '⌫'; btn.className += ' func wide-1-5';
+                        btn.onmousedown = (e) => { e.preventDefault(); backspace(); };
+                    } 
+                    else {
+                        btn.textContent = key;
+                        btn.onmousedown = (e) => { e.preventDefault(); insertChar(key); };
+                    }
+                    
+                    // Touch support
+                    btn.ontouchstart = btn.onmousedown;
+                    rowEl.appendChild(btn);
+                });
+                kbdBody.appendChild(rowEl);
             });
+
+            // Bottom Row (Controls)
+            const botRow = document.createElement('div'); botRow.className = 'kbd-row';
+            
+            const numBtn = document.createElement('div'); numBtn.className = 'kbd-key func wide-1-5 latin-key';
+            numBtn.textContent = kbState.lang === 'sym' ? 'ABC' : '?123';
+            numBtn.onmousedown = (e) => { e.preventDefault(); setKbMode(kbState.lang === 'sym' ? 'en' : 'sym'); };
+            numBtn.ontouchstart = numBtn.onmousedown;
+
+            const langBtn = document.createElement('div'); langBtn.className = 'kbd-key func';
+            langBtn.textContent = '🌐';
+            langBtn.onmousedown = (e) => { e.preventDefault(); if(kbState.lang !== 'sym') setKbMode(kbState.lang === 'ar' ? 'en' : 'ar'); };
+            langBtn.ontouchstart = langBtn.onmousedown;
+
+            const mathToggleBtn = document.createElement('div'); mathToggleBtn.className = 'kbd-key func latin-key';
+            mathToggleBtn.innerHTML = '<b>∑</b> Math';
+            mathToggleBtn.onmousedown = (e) => { e.preventDefault(); setKbMode('math'); };
+            mathToggleBtn.ontouchstart = mathToggleBtn.onmousedown;
+
+            const spaceBtn = document.createElement('div'); spaceBtn.className = 'kbd-key func space';
+            spaceBtn.textContent = kbState.lang === 'en' ? 'English' : (kbState.lang === 'ar' ? 'العربية' : 'مسافة');
+            spaceBtn.onmousedown = (e) => { e.preventDefault(); insertChar(' '); };
+            spaceBtn.ontouchstart = spaceBtn.onmousedown;
+
+            const dotBtn = document.createElement('div'); dotBtn.className = 'kbd-key func';
+            dotBtn.textContent = '.';
+            dotBtn.onmousedown = (e) => { e.preventDefault(); insertChar('.'); };
+            dotBtn.ontouchstart = dotBtn.onmousedown;
+
+            const enterBtn = document.createElement('div'); enterBtn.className = 'kbd-key func enter';
+            enterBtn.textContent = '↵';
+            enterBtn.onmousedown = (e) => { e.preventDefault(); if (activeField && activeField.tagName === 'TEXTAREA') insertChar('\n'); else hideKeyboard(); };
+            enterBtn.ontouchstart = enterBtn.onmousedown;
+
+            botRow.append(numBtn, langBtn, mathToggleBtn, spaceBtn, dotBtn, enterBtn);
+            kbdBody.appendChild(botRow);
         }
 
-        function renderEnglishKeyboard() {
-            const rows = isShift ? enUpper : enLower;
-            buildKeys(['rowEn1', 'rowEn2', 'rowEn3'], rows, 'latin');
+        function setKbMode(mode) {
+            kbState.lang = mode;
+            kbState.shift = false;
+            renderKeyboard();
         }
 
-        // بناء اللوحات الأساسية
-        buildKeys(['rowAr1', 'rowAr2', 'rowAr3'], arabicRows, '');
-        buildKeys(['rowNum1', 'rowNum2'], numberRows, 'num latin');
-        renderEnglishKeyboard();
-
-        // زر التبديل Shift
-        const shiftBtn = document.getElementById('shiftBtn');
-        shiftBtn.addEventListener('mousedown', (e) => {
-            e.preventDefault();
-            isShift = !isShift;
-            shiftBtn.classList.toggle('active', isShift);
-            renderEnglishKeyboard();
-        });
-        shiftBtn.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            isShift = !isShift;
-            shiftBtn.classList.toggle('active', isShift);
-            renderEnglishKeyboard();
-        }, { passive: false });
-
+        // Typing logic
         document.addEventListener('click', (e) => { const field = e.target.closest('.answer-field'); if (field) activateField(field); });
         document.addEventListener('touchend', (e) => { const field = e.target.closest('.answer-field'); if (field) setTimeout(() => activateField(field), 30); }, { passive: true });
 
@@ -477,7 +516,9 @@
             document.querySelectorAll('.answer-field').forEach(f => f.classList.remove('active-field'));
             field.classList.add('active-field'); activeField = field;
             caretPos = field.selectionStart ?? field.value.length;
-            dragLabel.textContent = 'جاهز للكتابة'; dragLabel.classList.add('active'); openKeyboard();
+            dragLabel.textContent = 'جاهز للكتابة'; dragLabel.classList.add('active');
+            kbdPanel.classList.add('open');
+            if(!kbdBody.innerHTML) renderKeyboard(); // initial render
         }
 
         function insertChar(ch) {
@@ -485,6 +526,7 @@
             const val = activeField.value;
             activeField.value = val.slice(0, caretPos) + ch + val.slice(caretPos);
             caretPos += ch.length; refocusCaret();
+            if (kbState.shift && kbState.lang === 'en') { kbState.shift = false; renderKeyboard(); } // auto-unshift english
         }
 
         function backspace() {
@@ -496,73 +538,54 @@
 
         function refocusCaret() { activeField.focus(); try { activeField.setSelectionRange(caretPos, caretPos); } catch (e) {} }
 
-        document.querySelectorAll('[data-action]').forEach(el => {
-            el.addEventListener('mousedown', (e) => {
-                e.preventDefault(); const action = el.dataset.action;
-                if (action === 'backspace') backspace();
-                else if (action === 'space') insertChar(' ');
-                else if (action === 'enter') { if (activeField && activeField.tagName === 'TEXTAREA') insertChar('\n'); else hideKeyboard(); }
-            });
-        });
-
-        function openKeyboard() { kbdPanel.classList.add('open'); }
         function hideKeyboard() {
             kbdPanel.classList.remove('open');
             if (activeField) { activeField.classList.remove('active-field'); activeField = null; }
-            dragLabel.textContent = 'اضغط على أي حقل للكتابة'; dragLabel.classList.remove('active');
+            dragLabel.textContent = 'اضغط على حقل للكتابة'; dragLabel.classList.remove('active');
         }
 
-        document.getElementById('kbdDrag').addEventListener('click', () => { kbdPanel.classList.contains('open') ? hideKeyboard() : (activeField && openKeyboard()); });
+        document.getElementById('kbdDrag').addEventListener('click', () => { kbdPanel.classList.contains('open') ? hideKeyboard() : (activeField && kbdPanel.classList.add('open')); });
 
-        document.querySelectorAll('.kbd-tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                document.querySelectorAll('.kbd-tab').forEach(t => t.classList.remove('active'));
+        /* ================= MathType Engine Integration ================= */
+        const mathField = document.getElementById('mathField');
+        
+        // Tab Switching for Math Palettes
+        document.querySelectorAll('.m-tab').forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                e.preventDefault();
+                document.querySelectorAll('.m-tab').forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
-                document.querySelectorAll('.kbd-panel-view').forEach(v => v.style.display = 'none');
-                document.getElementById('view-' + tab.dataset.tab).style.display = 'block';
+                document.querySelectorAll('.palette-grid').forEach(p => p.classList.remove('active'));
+                document.getElementById(tab.dataset.target).classList.add('active');
             });
         });
 
-        /* ================= MathLive Shortcuts & Commands ================= */
-        const mathField = document.getElementById('mathField');
-        
-        // دالة لإدراج الاختصارات الرياضية مباشرة داخل حقل MathLive
-        window.insertMathCmd = function(cmd) {
-            event.preventDefault();
-            mathField.insert(cmd);
-            mathField.focus();
-        };
+        // Insert Math Commands
+        document.querySelectorAll('.math-btn').forEach(btn => {
+            btn.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                const cmd = btn.getAttribute('data-cmd');
+                mathField.insert(cmd);
+                mathField.focus();
+            });
+            btn.addEventListener('touchstart', btn.onmousedown, {passive: false});
+        });
 
+        // Math Actions
         document.getElementById('mathInsertBtn').addEventListener('mousedown', (e) => {
             e.preventDefault();
-            if (!activeField) return showToast('اضغط أولًا داخل الحقل الذي تريد الكتابة فيه');
+            if (!activeField) return showToast('حدد الحقل النصي أولاً');
             const latex = mathField.getValue('latex');
             if(latex) {
                 insertChar(`$$${latex}$$`);
                 showToast('تم إدراج المعادلة ✓');
+                setKbMode('ar'); // Return to text automatically
             }
         });
+        document.getElementById('mathClearBtn').addEventListener('mousedown', (e) => { e.preventDefault(); mathField.setValue(''); });
 
-        document.getElementById('mathCopyBtn').addEventListener('mousedown', (e) => {
-            e.preventDefault();
-            const latex = mathField.getValue('latex');
-            if(latex) navigator.clipboard.writeText(`$$${latex}$$`).then(() => showToast('تم نسخ المعادلة ✓'));
-        });
-
-        document.getElementById('mathClearBtn').addEventListener('mousedown', (e) => {
-            e.preventDefault();
-            mathField.setValue('');
-        });
-
-        let toastTimer;
-        function showToast(msg) {
-            const t = document.getElementById('toast');
-            t.textContent = msg; t.classList.add('show');
-            clearTimeout(toastTimer);
-            toastTimer = setTimeout(() => t.classList.remove('show'), 1800);
-        }
-
-        renderList();
+        // Initial setup
+        renderKeyboard();
     </script>
 </body>
 </html>
