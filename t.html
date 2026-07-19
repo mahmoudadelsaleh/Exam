@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>امتحان الرياضيات</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;700;800&family=Tajawal:wght@400;500;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/mathlive@0.98/dist/mathlive.min.js"></script>
+
+<style>
+:root{
+  --bg: #0B1220;
+  --surface: #121B2E;
+  --surface-2: #1A2540;
+  --border: #263251;
+  --gold: #D4A954;
+  --gold-dim: #8A7038;
+  --teal: #4FB6A6;
+  --red: #E2695B;
+  --text: #ECEFF6;
+  --text-mute: #8A93A6;
+  --radius: 14px;
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
+html,body{
+  margin:0; padding:0; height:100%;
+  background: radial-gradient(circle at 50% 0%, #16213A 0%, var(--bg) 55%);
+  color: var(--text);
+  font-family: 'Tajawal', sans-serif;
+  overflow-x:hidden;
+}
+.latin, input, textarea, .kbd-key.num, .timer, .badge-count{
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ===== Top bar ===== */
+.topbar{
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 14px 22px;
+  background: linear-gradient(180deg, rgba(18,27,46,.95), rgba(18,27,46,.7));
+  border-bottom: 1px solid var(--border);
+  position: sticky; top:0; z-index: 20;
+  backdrop-filter: blur(8px);
+}
+.topbar h1{
+  font-family:'Cairo', sans-serif; font-weight:800; font-size: 18px; margin:0;
+  color: var(--gold); letter-spacing:.2px;
+}
+.topbar .sub{ font-size:12px; color:var(--text-mute); margin-top:2px; }
+.timer-box{
+  display:flex; align-items:center; gap:8px;
+  background: var(--surface-2); border:1px solid var(--border);
+  padding:8px 14px; border-radius: 999px;
+}
+.timer-box .dot{ width:8px; height:8px; border-radius:50%; background:var(--teal); box-shadow:0 0 8px var(--teal); animation: pulse 1.6s infinite; }
+@keyframes pulse{ 0%,100%{opacity:1} 50%{opacity:.3} }
+.timer{ font-size:15px; font-weight:700; color: var(--text); }
+
+/* ===== Progress ===== */
+.progress-wrap{ padding: 14px 22px 0; max-width: 760px; margin: 0 auto; }
+.progress-track{ height:6px; border-radius:999px; background: var(--surface-2); overflow:hidden; }
+.progress-fill{ height:100%; background: linear-gradient(90deg, var(--gold-dim), var(--gold)); transition: width .35s ease; }
+.progress-label{ display:flex; justify-content:space-between; font-size:12px; color:var(--text-mute); margin-top:8px; }
+.progress-label .latin{ color: var(--gold); font-weight:700; }
+
+/* ===== Card ===== */
+.wrap{ max-width: 760px; margin: 0 auto; padding: 18px 22px 240px; }
+.card{
+  background: var(--surface);
+  border:1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 26px 24px;
+  box-shadow: 0 20px 40px -20px rgba(0,0,0,.5);
+}
+.q-meta{ display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+.q-num{
+  font-family:'Cairo',sans-serif; font-weight:800; font-size:13px;
+  background: var(--surface-2); color: var(--gold);
+  border:1px solid var(--gold-dim); border-radius:8px; padding:4px 10px;
+}
+.q-type{
+  font-size:12px; color: var(--text-mute); border:1px solid var(--border);
+  padding:4px 10px; border-radius:8px;
+}
+.q-text{
+  font-family:'Cairo',sans-serif; font-weight:700; font-size: 19px; line-height:2;
+  color: var(--text); margin: 4px 0 22px;
+}
+.q-text .katex{ font-size: 1.05em; }
+
+/* MCQ options */
+.options{ display:flex; flex-direction:column; gap:12px; }
+.opt{
+  display:flex; align-items:center; gap:14px;
+  padding: 14px 16px; border-radius: 12px;
+  background: var(--surface-2); border:1px solid var(--border);
+  cursor:pointer; transition: border-color .15s, background .15s, transform .1s;
+}
+.opt:hover{ border-color: var(--gold-dim); }
+.opt.selected{ border-color: var(--teal); background: rgba(79,182,166,.1); }
+.opt .letter{
+  font-family:'JetBrains Mono',monospace; font-weight:700; font-size:14px;
+  width: 30px; height:30px; border-radius:8px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  background: var(--bg); color: var(--gold); border:1px solid var(--border);
+}
+.opt.selected .letter{ background: var(--teal); color:#08211D; border-color: var(--teal); }
+.opt .opt-text{ font-size:15.5px; line-height:1.9; }
+
+/* Essay */
+.essay-field{
+  width:100%; min-height: 130px; resize:vertical;
+  background: var(--bg); border:1.5px solid var(--border); border-radius:12px;
+  color: var(--text); font-size:16px; line-height:2; padding:14px 16px;
+  caret-color: var(--gold);
+}
+.essay-field:focus{ outline:none; border-color: var(--gold-dim); }
+.essay-field.active-field{ border-color: var(--teal); box-shadow: 0 0 0 3px rgba(79,182,166,.15); }
+.essay-hint{ font-size:12px; color:var(--text-mute); margin-top:8px; }
+
+/* Student name */
+.student-row{ display:flex; align-items:center; gap:10px; margin-bottom: 18px; }
+.student-row label{ font-size:13px; color:var(--text-mute); white-space:nowrap; }
+.name-field{
+  flex:1; background: var(--surface-2); border:1.5px solid var(--border); border-radius:10px;
+  padding:10px 14px; color:var(--text); font-size:15px;
+}
+.name-field:focus, .name-field.active-field{ outline:none; border-color: var(--teal); }
+
+/* Nav buttons */
+.nav-row{ display:flex; justify-content:space-between; align-items:center; margin-top: 26px; gap:12px; }
+.btn{
+  font-family:'Cairo',sans-serif; font-weight:700; font-size:14.5px;
+  border:none; border-radius:10px; padding: 12px 22px; cursor:pointer;
+  transition: transform .1s, filter .15s;
+}
+.btn:active{ transform: scale(.97); }
+.btn-ghost{ background: var(--surface-2); color: var(--text); border:1px solid var(--border); }
+.btn-ghost:hover{ filter:brightness(1.15); }
+.btn-primary{ background: linear-gradient(135deg, var(--gold), #B98B3D); color:#221705; }
+.btn-primary:hover{ filter:brightness(1.08); }
+.btn-primary:disabled, .btn-ghost:disabled{ opacity:.35; cursor:not-allowed; }
+.btn-submit{ background: linear-gradient(135deg, var(--teal), #2F8A7C); color:#06201B; }
+
+/* ===== Virtual Keyboard ===== */
+.kbd-panel{
+  position: fixed; bottom:0; left:0; right:0; z-index: 30;
+  background: linear-gradient(180deg, #101A2E, #0C1424);
+  border-top: 1px solid var(--border);
+  box-shadow: 0 -18px 40px -12px rgba(0,0,0,.55);
+  transform: translateY(calc(100% - 46px));
+  transition: transform .28s ease;
+}
+.kbd-panel.open{ transform: translateY(0); }
+.kbd-panel.disabled{ transform: translateY(100%); }
+.kbd-drag{
+  height:46px; display:flex; align-items:center; justify-content:center; gap:10px;
+  cursor:pointer; position:relative;
+}
+.kbd-drag .grip{ width:38px; height:4px; border-radius:2px; background: var(--border); }
+.kbd-drag .drag-label{ position:absolute; right:20px; font-size:12px; color:var(--text-mute); }
+
+.kbd-tabs{ display:flex; gap:8px; padding: 0 16px 10px; }
+.kbd-tab{
+  font-family:'Cairo',sans-serif; font-weight:700; font-size:13px;
+  padding:7px 16px; border-radius:999px; border:1px solid var(--border);
+  background: var(--surface-2); color: var(--text-mute); cursor:pointer;
+}
+.kbd-tab.active{ background: var(--gold); color:#221705; border-color:var(--gold); }
+.kbd-tab.math-tab.active{ background: var(--teal); color:#06201B; border-color:var(--teal); }
+
+.kbd-body{ padding: 0 12px 16px; max-width:760px; margin:0 auto; }
+.kbd-rows{ display:flex; flex-direction:column; gap:8px; }
+.kbd-row{ display:flex; gap:6px; justify-content:center; }
+.kbd-key{
+  flex:1; max-width:52px; height:46px;
+  display:flex; align-items:center; justify-content:center;
+  background: var(--surface-2); border:1px solid var(--border); border-radius:9px;
+  color: var(--text); font-size:17px; cursor:pointer; user-select:none;
+  transition: background .1s, transform .05s;
+}
+.kbd-key:active{ background: var(--gold-dim); transform: scale(.94); }
+.kbd-key.wide{ max-width: 120px; flex: 2; font-size:13px; font-family:'Cairo',sans-serif; font-weight:700; }
+.kbd-key.space{ max-width: none; flex: 6; }
+.kbd-key.func{ color: var(--gold); border-color: var(--gold-dim); }
+.kbd-key.num{ font-family:'JetBrains Mono',monospace; font-weight:700; }
+
+.math-panel{ display:flex; flex-direction:column; gap:12px; align-items:center; }
+math-field{
+  width:100%; min-height:52px; border-radius:10px; border:1.5px solid var(--gold-dim);
+  background: var(--bg); font-size:19px; padding: 6px 10px;
+}
+.math-actions{ display:flex; gap:10px; width:100%; }
+.math-actions .btn{ flex:1; }
+
+/* Toast */
+.toast{
+  position: fixed; top: 18px; left:50%; transform: translateX(-50%) translateY(-20px);
+  background: var(--surface-2); border:1px solid var(--teal); color: var(--text);
+  padding: 10px 20px; border-radius:10px; font-size:14px; z-index: 100;
+  opacity:0; transition: opacity .25s, transform .25s; pointer-events:none;
+}
+.toast.show{ opacity:1; transform: translateX(-50%) translateY(0); }
+
+/* Results modal */
+.modal-overlay{
+  position:fixed; inset:0; background: rgba(4,8,16,.75); backdrop-filter: blur(4px);
+  display:none; align-items:center; justify-content:center; z-index: 200; padding:20px;
+}
+.modal-overlay.show{ display:flex; }
+.modal-box{
+  background: var(--surface); border:1px solid var(--border); border-radius:16px;
+  max-width: 420px; width:100%; padding: 30px 26px; text-align:center;
+}
+.modal-box h2{ font-family:'Cairo',sans-serif; color:var(--gold); margin:0 0 10px; }
+.modal-box .score{ font-family:'JetBrains Mono',monospace; font-size:42px; font-weight:700; color: var(--teal); margin: 14px 0; }
+.modal-box p{ color: var(--text-mute); font-size:14px; line-height:1.8; }
+
+@media (max-width:520px){
+  .q-text{ font-size:17px; }
+  .kbd-key{ height:42px; font-size:15px; }
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <h1>امتحان الرياضيات &mdash; الوحدة الثانية</h1>
+    <div class="sub">الصف الخامس الابتدائي</div>
+  </div>
+  <div class="timer-box">
+    <span class="dot"></span>
+    <span class="timer" id="timerDisplay">45:00</span>
+  </div>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  <div class="progress-label">
+    <span>السؤال <span class="latin" id="qCurrent">1</span> من <span class="latin" id="qTotal">5</span></span>
+    <span id="progressPct" class="latin">0%</span>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="card" id="examCard">
+
+    <div class="student-row">
+      <label>اسم الطالب:</label>
+      <input type="text" class="name-field answer-field" id="studentName" readonly inputmode="none" placeholder="اضغط هنا واكتب بلوحة المفاتيح بالأسفل">
+    </div>
+
+    <div id="questionContainer"></div>
+
+    <div class="nav-row">
+      <button class="btn btn-ghost" id="prevBtn">السابق</button>
+      <button class="btn btn-primary" id="nextBtn">التالي</button>
+      <button class="btn btn-submit" id="submitBtn" style="display:none;">تسليم الامتحان</button>
+    </div>
+  </div>
+</div>
+
+<!-- Virtual Keyboard -->
+<div class="kbd-panel" id="kbdPanel">
+  <div class="kbd-drag" id="kbdDrag">
+    <span class="drag-label">لوحة المفاتيح</span>
+    <div class="grip"></div>
+  </div>
+
+  <div class="kbd-tabs">
+    <button class="kbd-tab active" data-tab="letters">أ حروف</button>
+    <button class="kbd-tab" data-tab="numbers">١٢٣ أرقام ورموز</button>
+    <button class="kbd-tab math-tab" data-tab="math">∑ معادلة</button>
+  </div>
+
+  <div class="kbd-body">
+    <!-- Letters panel -->
+    <div class="kbd-panel-view" id="view-letters">
+      <div class="kbd-rows">
+        <div class="kbd-row" id="rowAr1"></div>
+        <div class="kbd-row" id="rowAr2"></div>
+        <div class="kbd-row" id="rowAr3"></div>
+        <div class="kbd-row">
+          <div class="kbd-key wide func" data-action="backspace">⌫ حذف</div>
+          <div class="kbd-key space" data-action="space">مسافة</div>
+          <div class="kbd-key wide func" data-action="enter">↵ إدخال</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Numbers/symbols panel -->
+    <div class="kbd-panel-view" id="view-numbers" style="display:none;">
+      <div class="kbd-rows">
+        <div class="kbd-row" id="rowNum1"></div>
+        <div class="kbd-row" id="rowNum2"></div>
+        <div class="kbd-row">
+          <div class="kbd-key wide func" data-action="backspace">⌫ حذف</div>
+          <div class="kbd-key space" data-action="space">مسافة</div>
+          <div class="kbd-key wide func" data-action="enter">↵ إدخال</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Math panel -->
+    <div class="kbd-panel-view" id="view-math" style="display:none;">
+      <div class="math-panel">
+        <math-field id="mathField" virtual-keyboard-mode="onfocus" math-virtual-keyboard-policy="manual">x^2+\frac{1}{2}</math-field>
+        <div class="math-actions">
+          <button class="btn btn-ghost" id="mathClearBtn">مسح</button>
+          <button class="btn btn-ghost" id="mathCopyBtn">نسخ الصيغة</button>
+          <button class="btn btn-primary" id="mathInsertBtn">إدراج المعادلة</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="modal-overlay" id="resultModal">
+  <div class="modal-box">
+    <h2>تم تسليم الامتحان</h2>
+    <div class="score latin" id="scoreDisplay">0 / 0</div>
+    <p>تم تسجيل إجاباتك بنجاح. راجع نتيجتك مع معلمك للاطلاع على التقييم الكامل للأسئلة المقالية.</p>
+    <button class="btn btn-primary" style="margin-top:18px;width:100%;" onclick="document.getElementById('resultModal').classList.remove('show')">إغلاق</button>
+  </div>
+</div>
+
+<script>
+/* ================= DATA ================= */
+const questions = [
+  {
+    type: 'mcq',
+    text: 'ناتج جمع الكسرين $$\\frac{1}{4} + \\frac{1}{2}$$ يساوي:',
+    options: [
+      { key:'a', text: '$$\\frac{2}{6}$$' },
+      { key:'b', text: '$$\\frac{3}{4}$$' },
+      { key:'c', text: '$$\\frac{1}{6}$$' },
+      { key:'d', text: '$$\\frac{2}{4}$$' },
+    ],
+    answer: 'b'
+  },
+  {
+    type: 'mcq',
+    text: 'الجذر التربيعي للعدد $$81$$ هو:',
+    options: [
+      { key:'a', text: '$$7$$' },
+      { key:'b', text: '$$8$$' },
+      { key:'c', text: '$$9$$' },
+      { key:'d', text: '$$11$$' },
+    ],
+    answer: 'c'
+  },
+  {
+    type: 'essay',
+    text: 'اشرح خطوات حل المعادلة $$2x + 6 = 14$$ موضحًا قيمة $$x$$.'
+  },
+  {
+    type: 'mcq',
+    text: 'إذا كان طول ضلع المربع $$5$$ سم، فإن مساحته تساوي:',
+    options: [
+      { key:'a', text: '$$10$$ سم مربع' },
+      { key:'b', text: '$$20$$ سم مربع' },
+      { key:'c', text: '$$25$$ سم مربع' },
+      { key:'d', text: '$$15$$ سم مربع' },
+    ],
+    answer: 'c'
+  },
+  {
+    type: 'essay',
+    text: 'اكتب مثالًا من حياتك اليومية تستخدم فيه فكرة النسبة المئوية $$\\%$$، واشرحه بجملتين.'
+  },
+];
+
+const state = {
+  current: 0,
+  answers: new Array(questions.length).fill(null),
+};
+
+/* ================= RENDER QUESTION ================= */
+const qContainer = document.getElementById('questionContainer');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const submitBtn = document.getElementById('submitBtn');
+
+function renderQuestion(){
+  const q = questions[state.current];
+  let html = `<div class="q-meta">
+      <span class="q-num">السؤال <span class="latin">${toLatin(state.current+1)}</span></span>
+      <span class="q-type">${q.type === 'mcq' ? 'اختياري' : 'مقالي'}</span>
+    </div>
+    <div class="q-text">${q.text}</div>`;
+
+  if(q.type === 'mcq'){
+    html += `<div class="options">`;
+    q.options.forEach(opt => {
+      const selected = state.answers[state.current] === opt.key ? 'selected' : '';
+      html += `<div class="opt ${selected}" data-key="${opt.key}">
+          <span class="letter latin">${opt.key}</span>
+          <span class="opt-text">${opt.text}</span>
+        </div>`;
+    });
+    html += `</div>`;
+  } else {
+    const val = state.answers[state.current] || '';
+    html += `<textarea class="essay-field answer-field" id="essayField" readonly inputmode="none" placeholder="اضغط هنا ثم استخدم لوحة المفاتيح بالأسفل للكتابة">${escapeHtml(val)}</textarea>
+      <div class="essay-hint">اكتب بالعربي، واستخدم لوحة "معادلة" لإدراج الأرقام والرموز الرياضية.</div>`;
+  }
+
+  qContainer.innerHTML = html;
+  renderMath(qContainer);
+
+  if(q.type === 'mcq'){
+    qContainer.querySelectorAll('.opt').forEach(el=>{
+      el.addEventListener('click', ()=>{
+        state.answers[state.current] = el.dataset.key;
+        renderQuestion();
+        hideKeyboard();
+      });
+    });
+  } else {
+    const field = document.getElementById('essayField');
+    bindAnswerField(field);
+  }
+
+  updateNav();
+  updateProgress();
+}
+
+function toLatin(n){ return String(n); }
+function escapeHtml(s){ return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function renderMath(scope){
+  renderMathInElement(scope, {
+    delimiters: [{left:'$$', right:'$$', display:false}],
+    throwOnError:false
+  });
+}
+
+/* ================= NAV ================= */
+function updateNav(){
+  prevBtn.disabled = state.current === 0;
+  const isLast = state.current === questions.length - 1;
+  nextBtn.style.display = isLast ? 'none' : 'inline-block';
+  submitBtn.style.display = isLast ? 'inline-block' : 'none';
+}
+function updateProgress(){
+  document.getElementById('qCurrent').textContent = toLatin(state.current+1);
+  document.getElementById('qTotal').textContent = toLatin(questions.length);
+  const pct = Math.round(((state.current+1)/questions.length)*100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressPct').textContent = pct + '%';
+}
+prevBtn.addEventListener('click', ()=>{ if(state.current>0){ state.current--; renderQuestion(); hideKeyboard(); }});
+nextBtn.addEventListener('click', ()=>{ if(state.current<questions.length-1){ state.current++; renderQuestion(); hideKeyboard(); }});
+submitBtn.addEventListener('click', ()=>{
+  let scoreKnown = 0, totalKnown = 0;
+  questions.forEach((q,i)=>{
+    if(q.type==='mcq'){ totalKnown++; if(state.answers[i]===q.answer) scoreKnown++; }
+  });
+  document.getElementById('scoreDisplay').textContent = `${toLatin(scoreKnown)} / ${toLatin(totalKnown)}`;
+  document.getElementById('resultModal').classList.add('show');
+});
+
+/* ================= VIRTUAL KEYBOARD ================= */
+const kbdPanel = document.getElementById('kbdPanel');
+let activeField = null;
+let caretPos = 0;
+
+const arabicRows = [
+  ['ض','ص','ث','ق','ف','غ','ع','ه','خ','ح'],
+  ['ج','د','ش','س','ي','ب','ل','ا','ت','ن'],
+  ['م','ك','ط','ئ','ء','ؤ','ر','لا','ى','ة'],
+];
+const numberRows = [
+  ['1','2','3','4','5','6','7','8','9','0'],
+  ['+','-','×','÷','=','(',')','.',',','%'],
+];
+
+function buildKeys(rowIds, rows, cls){
+  rowIds.forEach((rowId, i)=>{
+    const rowEl = document.getElementById(rowId);
+    rowEl.innerHTML = '';
+    rows[i].forEach(ch=>{
+      const key = document.createElement('div');
+      key.className = 'kbd-key ' + cls;
+      key.textContent = ch;
+      key.addEventListener('click', ()=> insertChar(ch));
+      rowEl.appendChild(key);
+    });
+  });
+}
+buildKeys(['rowAr1','rowAr2','rowAr3'], arabicRows, '');
+buildKeys(['rowNum1','rowNum2'], numberRows, 'num');
+
+function bindAnswerField(field){
+  field.addEventListener('click', ()=> activateField(field));
+  field.addEventListener('touchend', ()=> setTimeout(()=>activateField(field), 30));
+}
+document.getElementById('studentName') && bindAnswerField(document.getElementById('studentName'));
+
+function activateField(field){
+  document.querySelectorAll('.answer-field').forEach(f=>f.classList.remove('active-field'));
+  field.classList.add('active-field');
+  activeField = field;
+  caretPos = field.selectionStart ?? field.value.length;
+  openKeyboard();
+}
+
+function insertChar(ch){
+  if(!activeField) return;
+  const val = activeField.value;
+  activeField.value = val.slice(0, caretPos) + ch + val.slice(caretPos);
+  caretPos += ch.length;
+  refocusCaret();
+}
+function backspace(){
+  if(!activeField || caretPos===0) return;
+  const val = activeField.value;
+  activeField.value = val.slice(0, caretPos-1) + val.slice(caretPos);
+  caretPos -= 1;
+  refocusCaret();
+}
+function insertSpace(){ insertChar(' '); }
+function insertEnter(){
+  if(activeField && activeField.tagName === 'TEXTAREA'){ insertChar('\n'); }
+  else { hideKeyboard(); }
+}
+function refocusCaret(){
+  activeField.focus();
+  activeField.setSelectionRange(caretPos, caretPos);
+}
+
+document.querySelectorAll('[data-action]').forEach(el=>{
+  el.addEventListener('click', ()=>{
+    const action = el.dataset.action;
+    if(action==='backspace') backspace();
+    else if(action==='space') insertSpace();
+    else if(action==='enter') insertEnter();
+  });
+});
+
+/* Keyboard open/close + drag handle */
+function openKeyboard(){ kbdPanel.classList.add('open'); }
+function hideKeyboard(){ kbdPanel.classList.remove('open'); if(activeField){ activeField.classList.remove('active-field'); activeField=null; } }
+document.getElementById('kbdDrag').addEventListener('click', ()=>{
+  kbdPanel.classList.contains('open') ? hideKeyboard() : (activeField && openKeyboard());
+});
+
+/* Tabs */
+document.querySelectorAll('.kbd-tab').forEach(tab=>{
+  tab.addEventListener('click', ()=>{
+    document.querySelectorAll('.kbd-tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    document.querySelectorAll('.kbd-panel-view').forEach(v=>v.style.display='none');
+    document.getElementById('view-' + tab.dataset.tab).style.display = 'block';
+  });
+});
+
+/* Math mode: insert LaTeX into active field wrapped in $$...$$ */
+const mathField = document.getElementById('mathField');
+document.getElementById('mathInsertBtn').addEventListener('click', ()=>{
+  if(!activeField){ showToast('اضغط أولًا داخل حقل الإجابة'); return; }
+  const latex = mathField.getValue('latex');
+  insertChar(`$$${latex}$$`);
+  showToast('تم إدراج المعادلة ✓');
+});
+document.getElementById('mathCopyBtn').addEventListener('click', ()=>{
+  const latex = mathField.getValue('latex');
+  navigator.clipboard.writeText(`$$${latex}$$`).then(()=> showToast('تم نسخ المعادلة ✓'));
+});
+document.getElementById('mathClearBtn').addEventListener('click', ()=>{ mathField.setValue(''); });
+
+/* Toast */
+let toastTimer;
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=> t.classList.remove('show'), 1800);
+}
+
+/* ================= TIMER ================= */
+let seconds = 45*60;
+const timerDisplay = document.getElementById('timerDisplay');
+setInterval(()=>{
+  if(seconds<=0) return;
+  seconds--;
+  const m = String(Math.floor(seconds/60)).padStart(2,'0');
+  const s = String(seconds%60).padStart(2,'0');
+  timerDisplay.textContent = `${m}:${s}`;
+}, 1000);
+
+/* ================= INIT ================= */
+renderQuestion();
+</script>
+</body>
+</html>
